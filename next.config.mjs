@@ -1,5 +1,8 @@
 /** @type {import("next").NextConfig} */
 const nextConfig = {
+    output: "export",
+    reactStrictMode: true,
+    basePath: "/web-lab4-front",
     images: {
         remotePatterns: [
             {
