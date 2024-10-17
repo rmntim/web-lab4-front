@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Лабораторная работа №4
 
-## Getting Started
+Переписать приложение из предыдущей лабораторной работы с использованием следующих технологий:
 
-First, run the development server:
+- Уровень back-end должен быть основан на Java EE (необходимо использовать EJB).
+- Уровень front-end должен быть построен на React + Redux (необходимо использовать ES6 и JSX) с использованием набора компонентов PrimeReact. (По договоренности с практиком было заменено на Next.js + shadcn/ui)
+- Взаимодействие между уровнями back-end и front-end должно быть организовано посредством REST API.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Приложение по-прежнему должно включать в себя 2 страницы - стартовую и основную страницу приложения. Обе страницы приложения должны быть адаптированы для отображения в 3 режимах:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- "Десктопный" - для устройств, ширина экрана которых равна или превышает 1210 пикселей.
+- "Планшетный" - для устройств, ширина экрана которых равна или превышает 754, но меньше 1210 пикселей.
+- "Мобильный"- для устройств, ширина экрана которых меньше 754 пикселей.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Стартовая страница должна содержать следующие элементы:**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- "Шапку", содержащую ФИО студента, номер группы и номер варианта.
+- Форму для ввода логина и пароля. Информация о зарегистрированных в системе пользователях должна храниться в отдельной таблице БД (пароль должен храниться в виде хэш-суммы). Доступ неавторизованных пользователей к основной странице приложения должен быть запрещён.
 
-## Learn More
+**Основная страница приложения должна содержать следующие элементы:**
 
-To learn more about Next.js, take a look at the following resources:
+- Набор полей ввода для задания координат точки и радиуса области в соответствии с вариантом задания: Text (-3 ... 3) для координаты по оси X, Text (-3 ... 3) для координаты по оси Y, и Text (-3 ... 3) для задания радиуса области. Если поле ввода допускает ввод заведомо некорректных данных (таких, например, как буквы в координатах точки или отрицательный радиус), то приложение должно осуществлять их валидацию.
+- Динамически обновляемую картинку, изображающую область на координатной плоскости в соответствии с номером варианта и точки, координаты которых были заданы пользователем. Клик по картинке должен инициировать сценарий, осуществляющий определение координат новой точки и отправку их на сервер для проверки её попадания в область. Цвет точек должен зависить от факта попадания / непопадания в область. Смена радиуса также должна инициировать перерисовку картинки.
+- Таблицу со списком результатов предыдущих проверок.
+- Кнопку, по которой аутентифицированный пользователь может закрыть свою сессию и вернуться на стартовую страницу приложения.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Дополнительные требования к приложению:**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Все результаты проверки должны сохраняться в базе данных под управлением СУБД Oracle. (По договоренности с практиком было заменено на PostgreSQL)
+- Для доступа к БД необходимо использовать JPA.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+![graph](assets/areas.png)
