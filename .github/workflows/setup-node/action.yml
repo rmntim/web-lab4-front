@@ -8,6 +8,9 @@ runs:
       with:
         node-version: 20
 
+    - name: Setup PNPM
+      uses: pnpm/action-setup@v4
+
     - name: Cache dependencies
       id: cache_dependencies
       uses: actions/cache@v3
@@ -18,4 +21,4 @@ runs:
     - name: Install dependencies 🔧
       shell: bash
       if: steps.cache_dependencies.outputs.cache-hit != 'true'
-      run: npm ci
+      run: pnpm ci
