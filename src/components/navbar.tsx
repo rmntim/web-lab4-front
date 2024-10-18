@@ -16,7 +16,7 @@ export function Navbar() {
                 <div className="flex justify-between h-14 items-center font-semibold">
                     <nav className="flex gap-4">
                         <Link
-                            href="#"
+                            href="/"
                             className="flex items-center px-4"
                             prefetch={false}
                         >
@@ -25,32 +25,19 @@ export function Navbar() {
                         </Link>
                         <div className="hidden md:flex gap-4">
                             <Link
-                                href="#"
+                                href="/panel"
                                 className="flex items-center text-sm transition-colors hover:underline"
                                 prefetch={false}
                             >
-                                Home
+                                Panel
                             </Link>
                             <Link
-                                href="#"
+                                href="https://github.com/rmntim/web-lab4-front"
                                 className="flex items-center text-sm transition-colors hover:underline"
+                                target="_blank"
                                 prefetch={false}
                             >
-                                About
-                            </Link>
-                            <Link
-                                href="#"
-                                className="flex items-center text-sm transition-colors hover:underline"
-                                prefetch={false}
-                            >
-                                Services
-                            </Link>
-                            <Link
-                                href="#"
-                                className="flex items-center text-sm transition-colors hover:underline"
-                                prefetch={false}
-                            >
-                                Contact
+                                Github
                             </Link>
                         </div>
                     </nav>

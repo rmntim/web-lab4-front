@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={`${montserrat.className} antialiased`}>
+            <body className={`${montserrat.className} antialiased min-h-screen flex flex-col`}>
                 <ThemeProvider
                     attribute="class"
                     defaultTheme="dark"
@@ -27,7 +27,7 @@ export default function RootLayout({
                     disableTransitionOnChange
                 >
                     <Navbar />
-                    <main className="p-4">{children}</main>
+                    <main className="p-4 flex-grow flex flex-col">{children}</main>
                 </ThemeProvider>
             </body>
         </html>
