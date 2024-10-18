@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import React from "react";
 import { ModeToggle } from "@/components/theme-picker";
 import { DesktopIcon } from "@radix-ui/react-icons";
+import Clock from "@/components/clock";
 
 export function Navbar() {
     return (
@@ -41,6 +42,7 @@ export function Navbar() {
                             </Link>
                         </div>
                     </nav>
+                    <Clock />
                     <div className="flex items-center gap-4">
                         <Button variant="outline" size="sm">
                             Sign in
