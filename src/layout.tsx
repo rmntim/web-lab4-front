@@ -11,9 +11,14 @@ import {
 } from "@mui/material";
 import { Brightness4, Brightness7 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { clearToken, RootState } from "./store";
+import { useDispatch, useSelector } from "react-redux";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const isAuthenticated =
+        useSelector((state: RootState) => state.jwt.token) !== null;
 
     const [darkMode, setDarkMode] = useState(true);
 
@@ -27,6 +32,11 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         setDarkMode(!darkMode);
     };
 
+    const handleLogout = () => {
+        dispatch(clearToken());
+        navigate("/");
+    };
+
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
@@ -35,12 +45,27 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>
                         Labwork 4
                     </Typography>
-                    <Button color="inherit" onClick={() => navigate("/login")}>
-                        Login
-                    </Button>
-                    <Button color="inherit" onClick={() => navigate("/signup")}>
-                        Signup
-                    </Button>
+
+                    {isAuthenticated ? (
+                        <Button color="inherit" onClick={handleLogout}>
+                            Logout
+                        </Button>
+                    ) : (
+                        <>
+                            <Button
+                                color="inherit"
+                                onClick={() => navigate("/login")}
+                            >
+                                Login
+                            </Button>
+                            <Button
+                                color="inherit"
+                                onClick={() => navigate("/signup")}
+                            >
+                                Signup
+                            </Button>
+                        </>
+                    )}
                     <IconButton color="inherit" onClick={toggleTheme}>
                         {darkMode ? <Brightness7 /> : <Brightness4 />}
                     </IconButton>
