@@ -5,26 +5,24 @@ import "@fontsource/roboto/700.css";
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import ScopedCssBaseline from "@mui/material/CssBaseline";
 import "./index.css";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Index from "./index/page.tsx";
-import { ThemeProvider } from "@mui/material";
-import theme from "./theme.tsx";
-
-const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <Index />,
-    },
-]);
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Layout from "./layout.tsx";
+import HomePage from "./index/page.tsx";
+import Dashboard from "./dashboard/page.tsx";
+import Login from "./login/page.tsx";
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
-        <ThemeProvider theme={theme}>
-            <ScopedCssBaseline enableColorScheme>
-                <RouterProvider router={router} />
-            </ScopedCssBaseline>
-        </ThemeProvider>
+        <Router>
+            <Layout>
+                <Routes>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<div>Signup</div>} />
+                </Routes>
+            </Layout>
+        </Router>
     </StrictMode>
 );
