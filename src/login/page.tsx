@@ -25,7 +25,7 @@ const Login = () => {
     const handleLogin = async (email: string, password: string) => {
         try {
             const response = await axios.post<{ token: string }>(
-                "/api/auth/login",
+                `${import.meta.env.VITE_API_URL}/api/auth/login`,
                 {
                     email,
                     password,
@@ -36,8 +36,8 @@ const Login = () => {
             navigate("/dashboard");
         } catch (err) {
             setError(
-                (err as AxiosError<string>).response?.data ||
-                    "Login failed. Please try again."
+                (err as AxiosError<{ errorMessage: string }>).response?.data
+                    .errorMessage || "Login failed. Please try again."
             );
         }
     };

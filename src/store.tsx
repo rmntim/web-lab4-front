@@ -31,7 +31,7 @@ export const { setToken, clearToken } = jwtSlice.actions;
 const apiSlice = createApi({
     reducerPath: "api",
     baseQuery: fetchBaseQuery({
-        baseUrl: "/api",
+        baseUrl: `${import.meta.env.API_URL}/api`,
         prepareHeaders: (headers, { getState }) => {
             const token = (getState() as RootState).jwt.token;
             if (token) {
