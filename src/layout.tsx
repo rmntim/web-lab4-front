@@ -42,7 +42,11 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <CssBaseline />
             <AppBar position="static">
                 <Toolbar>
-                    <Typography variant="h6" sx={{ flexGrow: 1 }}>
+                    <Typography
+                        variant="h6"
+                        sx={{ flexGrow: 1, cursor: "pointer" }}
+                        onClick={() => navigate("/")}
+                    >
                         Labwork 4
                     </Typography>
 
