@@ -1,4 +1,5 @@
 import {
+    Alert,
     Box,
     Button,
     Container,
@@ -8,18 +9,43 @@ import {
     Typography,
 } from "@mui/material";
 import { FormEvent, useState } from "react";
+import { useDispatch } from "react-redux";
+import { setToken } from "../store";
+import { useNavigate } from "react-router-dom";
+import axios, { AxiosError } from "axios";
 
 const Login = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
 
-    const handleLogin = (email: string, password: string) => {
-        console.log(email, password);
+    const handleLogin = async (email: string, password: string) => {
+        try {
+            const response = await axios.post<{ token: string }>(
+                "/api/auth/login",
+                {
+                    email,
+                    password,
+                }
+            );
+            const { token } = response.data;
+            dispatch(setToken(token));
+            navigate("/dashboard");
+        } catch (err) {
+            setError(
+                (err as AxiosError<string>).response?.data ||
+                    "Login failed. Please try again."
+            );
+        }
     };
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        handleLogin(email, password);
+        setError("");
+        await handleLogin(email, password);
     };
 
     return (
@@ -36,6 +62,11 @@ const Login = () => {
                 >
                     Login
                 </Typography>
+                {error && (
+                    <Alert severity="error" sx={{ mb: 2 }}>
+                        {error}
+                    </Alert>
+                )}
                 <Box
                     component="form"
                     noValidate
