@@ -17,8 +17,7 @@ const HomePage = () => {
         >
             <Box
                 sx={{
-                    backgroundImage:
-                        "url(https://via.placeholder.com/1500x500)",
+                    backgroundImage: "url(https://loremflickr.com/1500/500)",
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     width: "100%",
