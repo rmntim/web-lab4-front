@@ -12,18 +12,22 @@ import HomePage from "./index/page.tsx";
 import Dashboard from "./dashboard/page.tsx";
 import Login from "./login/page.tsx";
 import Signup from "./signup/page.tsx";
+import store from "./store.tsx";
+import { Provider } from "react-redux";
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
-        <Router>
-            <Layout>
-                <Routes>
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/signup" element={<Signup />} />
-                </Routes>
-            </Layout>
-        </Router>
+        <Provider store={store}>
+            <Router>
+                <Layout>
+                    <Routes>
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/signup" element={<Signup />} />
+                    </Routes>
+                </Layout>
+            </Router>
+        </Provider>
     </StrictMode>
 );
