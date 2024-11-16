@@ -35,11 +35,10 @@ const HomePage = () => {
                 }}
             >
                 <Typography variant="h4" gutterBottom>
-                    Welcome to Our Website
+                    Labwork 4
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                    Discover amazing content and features by exploring our
-                    dashboard.
+                    React + Java EE
                 </Typography>
                 <Button
                     variant="contained"
