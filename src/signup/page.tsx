@@ -1,5 +1,6 @@
 import { FormEvent, useState } from "react";
 import {
+    Alert,
     Box,
     Button,
     Container,
@@ -8,23 +9,49 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
+import axios, { AxiosError } from "axios";
+import { useDispatch } from "react-redux";
+import { setToken } from "../store";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
+    const [error, setError] = useState("");
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
     const handleSignup = async (
         email: string,
         username: string,
         password: string
     ) => {
-        console.log(email, username, password);
+        try {
+            const response = await axios.post<{ token: string }>(
+                `${import.meta.env.VITE_API_URL}/api/auth/signup`,
+                {
+                    email,
+                    username,
+                    password,
+                }
+            );
+            const { token } = response.data;
+            dispatch(setToken(token));
+            navigate("/dashboard");
+        } catch (err) {
+            setError(
+                (err as AxiosError<{ errorMessage: string }>).response?.data
+                    .errorMessage || "Signup failed. Please try again."
+            );
+        }
     };
 
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        handleSignup(email, username, password).catch(console.error);
+        setError("");
+        await handleSignup(email, username, password);
     };
 
     return (
@@ -41,6 +68,11 @@ const Signup = () => {
                 >
                     Signup
                 </Typography>
+                {error && (
+                    <Alert severity="error" sx={{ mb: 2 }}>
+                        {error}
+                    </Alert>
+                )}
                 <Box
                     component="form"
                     noValidate
