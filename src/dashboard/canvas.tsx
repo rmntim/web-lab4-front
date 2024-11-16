@@ -61,7 +61,6 @@ const Canvas = ({
 
         const centerX = canvas.width / 2;
         const centerY = canvas.height / 2;
-        console.log(centerX, centerY);
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
