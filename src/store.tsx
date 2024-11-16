@@ -1,5 +1,6 @@
 import { createSlice, configureStore, PayloadAction } from "@reduxjs/toolkit";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { Point, PointResult } from "./globals";
 
 // Define the initial state type
 interface JwtState {
@@ -31,7 +32,7 @@ export const { setToken, clearToken } = jwtSlice.actions;
 const apiSlice = createApi({
     reducerPath: "api",
     baseQuery: fetchBaseQuery({
-        baseUrl: `${import.meta.env.API_URL}/api`,
+        baseUrl: `${import.meta.env.VITE_API_URL}/api`,
         prepareHeaders: (headers, { getState }) => {
             const token = (getState() as RootState).jwt.token;
             if (token) {
@@ -41,13 +42,17 @@ const apiSlice = createApi({
         },
     }),
     endpoints: (builder) => ({
-        getUserPoints: builder.query<{ points: number[] }, void>({
-            query: () => "user/points",
+        addUserPoint: builder.mutation<PointResult, Point>({
+            query: (point) => ({
+                url: `user/points`,
+                method: "POST",
+                body: { ...point },
+            }),
         }),
     }),
 });
 
-export const { useGetUserPointsQuery } = apiSlice;
+export const { useAddUserPointMutation } = apiSlice;
 
 // Configure the store
 const store = configureStore({
