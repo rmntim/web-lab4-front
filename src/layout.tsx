@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
     AppBar,
     Button,
@@ -10,11 +10,11 @@ import {
     Typography,
 } from "@mui/material";
 import { Brightness4, Brightness7 } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { clearToken, RootState } from "./store";
 import { useDispatch, useSelector } from "react-redux";
 
-const Layout = ({ children }: { children: React.ReactNode }) => {
+const Layout = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const isAuthenticated =
@@ -75,7 +75,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                     </IconButton>
                 </Toolbar>
             </AppBar>
-            {children}
+            <Outlet />
         </ThemeProvider>
     );
 };
