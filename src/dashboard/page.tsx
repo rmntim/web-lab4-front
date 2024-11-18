@@ -10,16 +10,21 @@ import {
     TableRow,
     Paper,
     Container,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    DialogContentText,
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import {
     RootState,
     useAddUserPointMutation,
     useDeleteAllUserPointsMutation,
+    useGetUserPointsQuery,
 } from "../store";
 import { Navigate } from "react-router-dom";
 import { PointResult } from "../globals";
-import axios from "axios";
 import Canvas from "./canvas";
 
 const Page = () => {
@@ -36,23 +41,9 @@ const Page = () => {
 
 const Dashboard = () => {
     const [points, setPoints] = useState<PointResult[]>([]);
-    const token = useSelector((state: RootState) => state.jwt.token);
+    const { data } = useGetUserPointsQuery();
 
-    useEffect(() => {
-        axios
-            .get<PointResult[]>(
-                `${import.meta.env.VITE_API_URL}/api/user/points`,
-                {
-                    withCredentials: true,
-                }
-            )
-            .then((response) => {
-                setPoints(response.data);
-            })
-            .catch((err) => {
-                console.error("Failed to load points", err);
-            });
-    }, [token]);
+    useEffect(() => setPoints(data ?? []), [data]);
 
     const [x, setX] = useState("");
     const [y, setY] = useState("");
@@ -64,6 +55,12 @@ const Dashboard = () => {
     });
     const [addUserPoint] = useAddUserPointMutation();
     const [deleteAllUserPoints] = useDeleteAllUserPointsMutation();
+
+    const [deleteAllOpen, setDeleteAllOpen] = useState(false);
+
+    const handleDeleteAllClose = () => {
+        setDeleteAllOpen(false);
+    };
 
     const validateInput = () => {
         setError({ x: "", y: "", r: "" });
@@ -106,6 +103,7 @@ const Dashboard = () => {
         try {
             await deleteAllUserPoints().unwrap();
             setPoints([]);
+            setDeleteAllOpen(false);
         } catch (err) {
             console.error("Failed to delete all points", err);
         }
@@ -186,10 +184,33 @@ const Dashboard = () => {
                         variant="contained"
                         color="error"
                         type="button"
-                        onClick={handleDeleteAll}
+                        onClick={() => setDeleteAllOpen(true)}
                     >
                         Delete All
                     </Button>
+                    <Dialog
+                        open={deleteAllOpen}
+                        onClose={handleDeleteAllClose}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
+                    >
+                        <DialogTitle id="alert-dialog-title">
+                            Delete all points?
+                        </DialogTitle>
+                        <DialogContent>
+                            <DialogContentText id="alert-dialog-description">
+                                Are you sure you want to delete all points?
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleDeleteAllClose} autoFocus>
+                                No
+                            </Button>
+                            <Button onClick={handleDeleteAll} color="error">
+                                Yes
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
                 </form>
             </div>
 

@@ -9,15 +9,15 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-import axios, { AxiosError } from "axios";
 import { useDispatch } from "react-redux";
-import { setToken } from "../store";
+import { setToken, useSignupUserMutation } from "../store";
 import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
     const [error, setError] = useState("");
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [signupUser] = useSignupUserMutation();
 
     const handleSignup = async (
         email: string,
@@ -25,21 +25,19 @@ const Signup = () => {
         password: string
     ) => {
         try {
-            const response = await axios.post<{ token: string }>(
-                `${import.meta.env.VITE_API_URL}/api/auth/signup`,
-                {
-                    email,
-                    username,
-                    password,
-                }
-            );
-            const { token } = response.data;
+            const { token } = await signupUser({
+                email,
+                username,
+                password,
+            }).unwrap();
             dispatch(setToken(token));
             navigate("/dashboard");
         } catch (err) {
+            console.error("Failed to signup", err);
             setError(
-                (err as AxiosError<{ errorMessage: string }>).response?.data
-                    .errorMessage || "Signup failed. Please try again."
+                err.data.message ||
+                    err.data.errorMessage ||
+                    "Signup failed. Please try again."
             );
         }
     };

@@ -9,7 +9,7 @@ interface JwtState {
 
 // Initial state for the JWT slice
 const initialState: JwtState = {
-    token: null,
+    token: localStorage.getItem("token"),
 };
 
 // JWT slice
@@ -19,14 +19,31 @@ const jwtSlice = createSlice({
     reducers: {
         setToken: (state, action: PayloadAction<string>) => {
             state.token = action.payload;
+            localStorage.setItem("token", action.payload);
         },
         clearToken: (state) => {
             state.token = null;
+            localStorage.removeItem("token");
         },
     },
 });
 
 export const { setToken, clearToken } = jwtSlice.actions;
+
+type LoginUser = {
+    email: string;
+    password: string;
+};
+
+type LoginUserResult = {
+    token: string;
+};
+
+type SignupUser = LoginUser & {
+    username: string;
+};
+
+type SignupUserResult = LoginUserResult;
 
 // API slice using createApi
 const apiSlice = createApi({
@@ -35,13 +52,39 @@ const apiSlice = createApi({
         baseUrl: `${import.meta.env.VITE_API_URL}/api`,
         prepareHeaders: (headers, { getState }) => {
             const token = (getState() as RootState).jwt.token;
-            if (token) {
+            if (token !== null) {
                 headers.set("Authorization", `Bearer ${token}`);
             }
             return headers;
         },
     }),
     endpoints: (builder) => ({
+        loginUser: builder.mutation<LoginUserResult, LoginUser>({
+            query: (user) => ({
+                url: `auth/login`,
+                method: "POST",
+                body: { ...user },
+            }),
+        }),
+        signupUser: builder.mutation<SignupUserResult, SignupUser>({
+            query: (user) => ({
+                url: `auth/signup`,
+                method: "POST",
+                body: { ...user },
+            }),
+        }),
+        logoutUser: builder.mutation<void, void>({
+            query: () => ({
+                url: `auth/logout`,
+                method: "POST",
+            }),
+        }),
+
+        getUserPoints: builder.query<PointResult[], void>({
+            query: () => ({
+                url: `user/points`,
+            }),
+        }),
         addUserPoint: builder.mutation<PointResult, Point>({
             query: (point) => ({
                 url: `user/points`,
@@ -58,8 +101,15 @@ const apiSlice = createApi({
     }),
 });
 
-export const { useAddUserPointMutation, useDeleteAllUserPointsMutation } =
-    apiSlice;
+export const {
+    useLoginUserMutation,
+    useSignupUserMutation,
+    useLogoutUserMutation,
+
+    useGetUserPointsQuery,
+    useAddUserPointMutation,
+    useDeleteAllUserPointsMutation,
+} = apiSlice;
 
 // Configure the store
 const store = configureStore({

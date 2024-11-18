@@ -10,9 +10,8 @@ import {
 } from "@mui/material";
 import { FormEvent, useState } from "react";
 import { useDispatch } from "react-redux";
-import { setToken } from "../store";
+import { setToken, useLoginUserMutation } from "../store";
 import { useNavigate } from "react-router-dom";
-import axios, { AxiosError } from "axios";
 
 const Login = () => {
     const dispatch = useDispatch();
@@ -21,23 +20,19 @@ const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [loginUser] = useLoginUserMutation();
 
     const handleLogin = async (email: string, password: string) => {
         try {
-            const response = await axios.post<{ token: string }>(
-                `${import.meta.env.VITE_API_URL}/api/auth/login`,
-                {
-                    email,
-                    password,
-                }
-            );
-            const { token } = response.data;
+            const { token } = await loginUser({ email, password }).unwrap();
             dispatch(setToken(token));
             navigate("/dashboard");
         } catch (err) {
+            console.error("Failed to login", err);
             setError(
-                (err as AxiosError<{ errorMessage: string }>).response?.data
-                    .errorMessage || "Login failed. Please try again."
+                err.data.message ||
+                    err.data.errorMessage ||
+                    "Login failed. Please try again."
             );
         }
     };

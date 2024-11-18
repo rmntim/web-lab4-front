@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { Brightness4, Brightness7 } from "@mui/icons-material";
 import { Outlet, useNavigate } from "react-router-dom";
-import { clearToken, RootState } from "./store";
+import { clearToken, RootState, useLogoutUserMutation } from "./store";
 import { useDispatch, useSelector } from "react-redux";
 
 const Layout = () => {
@@ -19,6 +19,7 @@ const Layout = () => {
     const dispatch = useDispatch();
     const isAuthenticated =
         useSelector((state: RootState) => state.jwt.token) !== null;
+    const [logoutUser] = useLogoutUserMutation();
 
     const [darkMode, setDarkMode] = useState(true);
 
@@ -32,9 +33,15 @@ const Layout = () => {
         setDarkMode(!darkMode);
     };
 
-    const handleLogout = () => {
-        dispatch(clearToken());
-        navigate("/");
+    const handleLogout = async () => {
+        try {
+            await logoutUser().unwrap();
+        } catch (err) {
+            console.error(err);
+        } finally {
+            dispatch(clearToken());
+            navigate("/");
+        }
     };
 
     return (
