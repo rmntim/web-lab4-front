@@ -21,10 +21,10 @@ import {
     RootState,
     useAddUserPointMutation,
     useDeleteAllUserPointsMutation,
+    useGetUserPointsQuery,
 } from "../store";
 import { Navigate } from "react-router-dom";
 import { PointResult } from "../globals";
-import { apiClient } from "../client";
 import Canvas from "./canvas";
 
 const Page = () => {
@@ -41,18 +41,9 @@ const Page = () => {
 
 const Dashboard = () => {
     const [points, setPoints] = useState<PointResult[]>([]);
-    const token = useSelector((state: RootState) => state.jwt.token);
+    const { data } = useGetUserPointsQuery();
 
-    useEffect(() => {
-        apiClient
-            .get<PointResult[]>(`/api/user/points`)
-            .then((response) => {
-                setPoints(response.data);
-            })
-            .catch((err) => {
-                console.error("Failed to load points", err);
-            });
-    }, [token]);
+    useEffect(() => setPoints(data ?? []), [data]);
 
     const [x, setX] = useState("");
     const [y, setY] = useState("");
