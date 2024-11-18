@@ -12,7 +12,11 @@ import {
     Container,
 } from "@mui/material";
 import { useSelector } from "react-redux";
-import { RootState, useAddUserPointMutation } from "../store";
+import {
+    RootState,
+    useAddUserPointMutation,
+    useDeleteAllUserPointsMutation,
+} from "../store";
 import { Navigate } from "react-router-dom";
 import { PointResult } from "../globals";
 import axios from "axios";
@@ -39,9 +43,7 @@ const Dashboard = () => {
             .get<PointResult[]>(
                 `${import.meta.env.VITE_API_URL}/api/user/points`,
                 {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+                    withCredentials: true,
                 }
             )
             .then((response) => {
@@ -61,6 +63,7 @@ const Dashboard = () => {
         r: "",
     });
     const [addUserPoint] = useAddUserPointMutation();
+    const [deleteAllUserPoints] = useDeleteAllUserPointsMutation();
 
     const validateInput = () => {
         setError({ x: "", y: "", r: "" });
@@ -96,6 +99,15 @@ const Dashboard = () => {
             setPoints((prev) => [...prev, point]);
         } catch (err) {
             console.error("Failed to add point", err);
+        }
+    };
+
+    const handleDeleteAll = async () => {
+        try {
+            await deleteAllUserPoints().unwrap();
+            setPoints([]);
+        } catch (err) {
+            console.error("Failed to delete all points", err);
         }
     };
 
@@ -169,6 +181,14 @@ const Dashboard = () => {
                     />
                     <Button variant="contained" color="primary" type="submit">
                         Submit
+                    </Button>
+                    <Button
+                        variant="contained"
+                        color="error"
+                        type="button"
+                        onClick={handleDeleteAll}
+                    >
+                        Delete All
                     </Button>
                 </form>
             </div>
