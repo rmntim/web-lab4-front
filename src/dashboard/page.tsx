@@ -16,6 +16,8 @@ import {
     DialogActions,
     DialogContentText,
     IconButton,
+    Snackbar,
+    Alert,
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import {
@@ -25,7 +27,7 @@ import {
     useDeleteUserPointMutation,
     useGetUserPointsQuery,
 } from "../store";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { PointResult } from "../globals";
 import Canvas from "./canvas";
 import { DeleteOutline } from "@mui/icons-material";
@@ -34,9 +36,10 @@ const Page = () => {
     const isAuthenticated = useSelector(
         (state: RootState) => state.jwt.token !== null
     );
+    const navigate = useNavigate();
 
     if (!isAuthenticated) {
-        return <Navigate to="/login" />;
+        navigate("/login");
     } else {
         return <Dashboard />;
     }
@@ -61,6 +64,19 @@ const Dashboard = () => {
     const [deleteUserPoint] = useDeleteUserPointMutation();
 
     const [deleteAllOpen, setDeleteAllOpen] = useState(false);
+
+    const [toastOpen, setToastOpen] = useState(false);
+    const [toastMessage, setToastMessage] = useState("");
+
+    const handleToastClose = () => {
+        setToastOpen(false);
+        setToastMessage("");
+    };
+
+    const toast = (message: string) => {
+        setToastOpen(true);
+        setToastMessage(message);
+    };
 
     const handleDeleteAllClose = () => {
         setDeleteAllOpen(false);
@@ -99,6 +115,7 @@ const Dashboard = () => {
             }).unwrap();
             setPoints((prev) => [...prev, point]);
         } catch (err) {
+            toast("Failed to add point");
             console.error("Failed to add point", err);
         }
     };
@@ -109,6 +126,7 @@ const Dashboard = () => {
             setPoints([]);
             setDeleteAllOpen(false);
         } catch (err) {
+            toast("Failed to delete all points");
             console.error("Failed to delete all points", err);
         }
     };
@@ -118,6 +136,7 @@ const Dashboard = () => {
             await deleteUserPoint(point).unwrap();
             setPoints((prev) => prev.filter((_, i) => i !== index));
         } catch (err) {
+            toast("Failed to delete point");
             console.error("Failed to delete point", err);
         }
     };
@@ -138,6 +157,7 @@ const Dashboard = () => {
                     })
                 );
         } catch (err) {
+            toast("Failed to add point");
             console.error("Failed to add point", err);
         }
         return result;
@@ -263,6 +283,13 @@ const Dashboard = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
+            <Snackbar
+                open={toastOpen}
+                autoHideDuration={6000}
+                onClose={handleToastClose}
+            >
+                <Alert severity="error">{toastMessage}</Alert>
+            </Snackbar>
         </Container>
     );
 };
