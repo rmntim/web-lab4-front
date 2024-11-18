@@ -32,14 +32,8 @@ export const { setToken, clearToken } = jwtSlice.actions;
 const apiSlice = createApi({
     reducerPath: "api",
     baseQuery: fetchBaseQuery({
-        baseUrl: `${import.meta.env.VITE_API_URL}/api`,
-        prepareHeaders: (headers, { getState }) => {
-            const token = (getState() as RootState).jwt.token;
-            if (token) {
-                headers.set("Authorization", `Bearer ${token}`);
-            }
-            return headers;
-        },
+        baseUrl: `/api`,
+        credentials: "include",
     }),
     endpoints: (builder) => ({
         addUserPoint: builder.mutation<PointResult, Point>({

@@ -12,7 +12,8 @@ import { FormEvent, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setToken } from "../store";
 import { useNavigate } from "react-router-dom";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
+import { apiClient } from "../client";
 
 const Login = () => {
     const dispatch = useDispatch();
@@ -24,8 +25,8 @@ const Login = () => {
 
     const handleLogin = async (email: string, password: string) => {
         try {
-            const response = await axios.post<{ token: string }>(
-                `${import.meta.env.VITE_API_URL}/api/auth/login`,
+            const response = await apiClient.post<{ token: string }>(
+                `/api/auth/login`,
                 {
                     email,
                     password,

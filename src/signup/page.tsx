@@ -9,10 +9,11 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import { useDispatch } from "react-redux";
 import { setToken } from "../store";
 import { useNavigate } from "react-router-dom";
+import { apiClient } from "../client";
 
 const Signup = () => {
     const [error, setError] = useState("");
@@ -25,8 +26,8 @@ const Signup = () => {
         password: string
     ) => {
         try {
-            const response = await axios.post<{ token: string }>(
-                `${import.meta.env.VITE_API_URL}/api/auth/signup`,
+            const response = await apiClient.post<{ token: string }>(
+                `/api/auth/signup`,
                 {
                     email,
                     username,
