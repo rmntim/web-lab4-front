@@ -15,17 +15,20 @@ import {
     DialogContent,
     DialogActions,
     DialogContentText,
+    IconButton,
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import {
     RootState,
     useAddUserPointMutation,
     useDeleteAllUserPointsMutation,
+    useDeleteUserPointMutation,
     useGetUserPointsQuery,
 } from "../store";
 import { Navigate } from "react-router-dom";
 import { PointResult } from "../globals";
 import Canvas from "./canvas";
+import { DeleteOutline } from "@mui/icons-material";
 
 const Page = () => {
     const isAuthenticated = useSelector(
@@ -55,6 +58,7 @@ const Dashboard = () => {
     });
     const [addUserPoint] = useAddUserPointMutation();
     const [deleteAllUserPoints] = useDeleteAllUserPointsMutation();
+    const [deleteUserPoint] = useDeleteUserPointMutation();
 
     const [deleteAllOpen, setDeleteAllOpen] = useState(false);
 
@@ -106,6 +110,15 @@ const Dashboard = () => {
             setDeleteAllOpen(false);
         } catch (err) {
             console.error("Failed to delete all points", err);
+        }
+    };
+
+    const handleDeletePoint = async (point: PointResult, index: number) => {
+        try {
+            await deleteUserPoint(point).unwrap();
+            setPoints((prev) => prev.filter((_, i) => i !== index));
+        } catch (err) {
+            console.error("Failed to delete point", err);
         }
     };
 
@@ -222,6 +235,7 @@ const Dashboard = () => {
                             <TableCell>Y</TableCell>
                             <TableCell>R</TableCell>
                             <TableCell>Result</TableCell>
+                            <TableCell>Delete</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -232,6 +246,17 @@ const Dashboard = () => {
                                 <TableCell>{point.r}</TableCell>
                                 <TableCell>
                                     {point.result ? "True" : "False"}
+                                </TableCell>
+                                <TableCell>
+                                    <IconButton
+                                        type="button"
+                                        color="error"
+                                        onClick={() =>
+                                            handleDeletePoint(point, index)
+                                        }
+                                    >
+                                        <DeleteOutline />
+                                    </IconButton>
                                 </TableCell>
                             </TableRow>
                         ))}

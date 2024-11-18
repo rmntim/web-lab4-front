@@ -98,6 +98,13 @@ const apiSlice = createApi({
                 method: "DELETE",
             }),
         }),
+        deleteUserPoint: builder.mutation<void, PointResult>({
+            query: (point) => ({
+                url: "user/points",
+                method: "PATCH",
+                body: { ...point },
+            }),
+        }),
     }),
 });
 
@@ -109,6 +116,7 @@ export const {
     useGetUserPointsQuery,
     useAddUserPointMutation,
     useDeleteAllUserPointsMutation,
+    useDeleteUserPointMutation,
 } = apiSlice;
 
 // Configure the store
