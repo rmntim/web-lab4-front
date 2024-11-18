@@ -29,7 +29,11 @@ const Login = () => {
             navigate("/dashboard");
         } catch (err) {
             console.error("Failed to login", err);
-            setError("Login failed. Please try again.");
+            setError(
+                err.data.message ||
+                    err.data.errorMessage ||
+                    "Login failed. Please try again."
+            );
         }
     };
 

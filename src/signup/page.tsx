@@ -34,7 +34,11 @@ const Signup = () => {
             navigate("/dashboard");
         } catch (err) {
             console.error("Failed to signup", err);
-            setError("Signup failed. Please try again.");
+            setError(
+                err.data.message ||
+                    err.data.errorMessage ||
+                    "Signup failed. Please try again."
+            );
         }
     };
 
