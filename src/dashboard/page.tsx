@@ -27,7 +27,7 @@ import {
     useDeleteUserPointMutation,
     useGetUserPointsQuery,
 } from "../store";
-import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { PointResult } from "../globals";
 import Canvas from "./canvas";
 import { DeleteOutline } from "@mui/icons-material";
@@ -36,21 +36,9 @@ const Page = () => {
     const isAuthenticated = useSelector(
         (state: RootState) => state.jwt.token !== null
     );
-    const navigate = useNavigate();
+    const { data, queryError } = useGetUserPointsQuery();
 
-    useEffect(() => {
-        if (!isAuthenticated) {
-            navigate("/login");
-        }
-    }, [isAuthenticated, navigate]);
-
-    if (!isAuthenticated) return null;
-    return <Dashboard />;
-};
-
-const Dashboard = () => {
     const [points, setPoints] = useState<PointResult[]>([]);
-    const { data } = useGetUserPointsQuery();
 
     useEffect(() => setPoints(data ?? []), [data]);
 
@@ -145,6 +133,13 @@ const Dashboard = () => {
     const checkPoint = async (x: number, y: number) => {
         await sendPoint(x, y, r);
     };
+
+    if (
+        !isAuthenticated ||
+        (error && "status" in error && error.status === 401)
+    ) {
+        return <Navigate to="/login" />;
+    }
 
     return (
         <Container
