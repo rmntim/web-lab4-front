@@ -11,13 +11,12 @@ import {
 } from "@mui/material";
 import { Brightness4, Brightness7 } from "@mui/icons-material";
 import { Outlet, useNavigate } from "react-router-dom";
-import { clearToken, RootState, useLogoutUserMutation } from "./store";
-import { useDispatch, useSelector } from "react-redux";
+import { RootState, useLogoutUserMutation } from "./store";
+import { useSelector } from "react-redux";
 import Clock from "./clock";
 
 const Layout = () => {
     const navigate = useNavigate();
-    const dispatch = useDispatch();
     const isAuthenticated =
         useSelector((state: RootState) => state.jwt.token) !== null;
     const [logoutUser] = useLogoutUserMutation();
@@ -40,7 +39,6 @@ const Layout = () => {
         } catch (err) {
             console.error(err);
         } finally {
-            dispatch(clearToken());
             navigate("/");
         }
     };

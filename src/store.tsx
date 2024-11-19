@@ -65,6 +65,10 @@ const apiSlice = createApi({
                 method: "POST",
                 body: { ...user },
             }),
+            onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+                const result = await queryFulfilled;
+                dispatch(setToken(result.data.token));
+            },
         }),
         signupUser: builder.mutation<SignupUserResult, SignupUser>({
             query: (user) => ({
@@ -72,12 +76,20 @@ const apiSlice = createApi({
                 method: "POST",
                 body: { ...user },
             }),
+            onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+                const result = await queryFulfilled;
+                dispatch(setToken(result.data.token));
+            },
         }),
         logoutUser: builder.mutation<void, void>({
             query: () => ({
                 url: `auth/logout`,
                 method: "POST",
             }),
+            onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+                await queryFulfilled;
+                dispatch(clearToken());
+            },
         }),
 
         getUserPoints: builder.query<PointResult[], void>({

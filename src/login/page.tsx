@@ -9,12 +9,10 @@ import {
     Typography,
 } from "@mui/material";
 import { FormEvent, useState } from "react";
-import { useDispatch } from "react-redux";
-import { setToken, useLoginUserMutation } from "../store";
+import { useLoginUserMutation } from "../store";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const [email, setEmail] = useState("");
@@ -24,16 +22,11 @@ const Login = () => {
 
     const handleLogin = async (email: string, password: string) => {
         try {
-            const { token } = await loginUser({ email, password }).unwrap();
-            dispatch(setToken(token));
+            await loginUser({ email, password }).unwrap();
             navigate("/dashboard");
         } catch (err) {
             console.error("Failed to login", err);
-            setError(
-                err.data.message ||
-                    err.data.errorMessage ||
-                    "Login failed. Please try again."
-            );
+            setError("Login failed. Please try again.");
         }
     };
 
