@@ -54,9 +54,9 @@ const Dashboard = () => {
 
     useEffect(() => setPoints(data ?? []), [data]);
 
-    const [x, setX] = useState("");
-    const [y, setY] = useState("");
-    const [r, setR] = useState("3");
+    const [x, setX] = useState(0);
+    const [y, setY] = useState(0);
+    const [r, setR] = useState(3);
     const [error, setError] = useState<{ x: string; y: string; r: string }>({
         x: "",
         y: "",
@@ -85,42 +85,40 @@ const Dashboard = () => {
         setDeleteAllOpen(false);
     };
 
-    const validateInput = () => {
-        setError({ x: "", y: "", r: "" });
-
-        const numX = parseFloat(x);
-        const numY = parseFloat(y);
-        const numR = parseFloat(r);
-
-        if (isNaN(numX) || numX < -3 || numX > 3) {
-            setError((err) => ({ ...err, x: "X must be between -3 and 3" }));
-        }
-        if (isNaN(numY) || numY < -3 || numY > 3) {
-            setError((err) => ({ ...err, y: "Y must be between -3 and 3" }));
-        }
-        if (isNaN(numR) || numR < 0 || numR > 3) {
-            setError((err) => ({ ...err, r: "R must be between 0 and 3" }));
-        }
-    };
-
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        validateInput();
-        if (error.x || error.y || error.r) {
-            return;
-        }
-
+    const sendPoint = async (x: number, y: number, r: number) => {
         try {
             const point = await addUserPoint({
-                x: parseFloat(x),
-                y: parseFloat(y),
-                r: parseFloat(r),
+                x,
+                y,
+                r,
             }).unwrap();
             setPoints((prev) => [...prev, point]);
+            return point.result;
         } catch (err) {
             toast("Failed to add point");
             console.error("Failed to add point", err);
         }
+        return false;
+    };
+
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setError({ x: "", y: "", r: "" });
+
+        if (x < -3 || x > 3) {
+            setError((err) => ({ ...err, x: "X must be between -3 and 3" }));
+            return;
+        }
+        if (y < -3 || y > 3) {
+            setError((err) => ({ ...err, y: "Y must be between -3 and 3" }));
+            return;
+        }
+        if (r < 0 || r > 3) {
+            setError((err) => ({ ...err, r: "R must be between 0 and 3" }));
+            return;
+        }
+
+        await sendPoint(x, y, r);
     };
 
     const handleDeleteAll = async () => {
@@ -144,26 +142,8 @@ const Dashboard = () => {
         }
     };
 
-    const checkPoint = (x: number, y: number) => {
-        let result = false;
-        try {
-            addUserPoint({
-                x,
-                y,
-                r: parseFloat(r),
-            })
-                .unwrap()
-                .then((point) =>
-                    setPoints((prev) => {
-                        result = point.result;
-                        return [...prev, point];
-                    })
-                );
-        } catch (err) {
-            toast("Failed to add point");
-            console.error("Failed to add point", err);
-        }
-        return result;
+    const checkPoint = async (x: number, y: number) => {
+        await sendPoint(x, y, r);
     };
 
     return (
@@ -194,22 +174,28 @@ const Dashboard = () => {
                 >
                     <TextField
                         label="X"
+                        type="number"
                         value={x}
-                        onChange={(e) => setX(e.target.value)}
+                        onChange={(e) => {
+                            setX(Number(e.target.value));
+                            console.log(x);
+                        }}
                         error={!!error.x}
                         helperText={error.x}
                     />
                     <TextField
                         label="Y"
+                        type="number"
                         value={y}
-                        onChange={(e) => setY(e.target.value)}
+                        onChange={(e) => setY(Number(e.target.value))}
                         error={!!error.y}
                         helperText={error.y}
                     />
                     <TextField
                         label="R"
+                        type="number"
                         value={r}
-                        onChange={(e) => setR(e.target.value)}
+                        onChange={(e) => setR(Number(e.target.value))}
                         error={!!error.r}
                         helperText={error.r}
                     />

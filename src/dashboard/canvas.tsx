@@ -7,7 +7,7 @@ type CanvasProps = {
     width?: number;
     height?: number;
     points: PointResult[];
-    check: (x: number, y: number) => boolean;
+    check: (x: number, y: number) => Promise<void>;
 };
 
 const Canvas = ({
@@ -108,7 +108,7 @@ const Canvas = ({
         });
     }, [radius, width, height, theme, MULTIPLIER, sign, points, addPoint]);
 
-    const handleCanvasClick = (event: MouseEvent<HTMLCanvasElement>) => {
+    const handleCanvasClick = async (event: MouseEvent<HTMLCanvasElement>) => {
         const canvas = canvasRef.current;
         if (!canvas) {
             return;
@@ -122,10 +122,7 @@ const Canvas = ({
 
         const dx = (x - centerX) / MULTIPLIER;
         const dy = (centerY - y) / MULTIPLIER;
-
-        const isInside = check(dx, dy);
-
-        addPoint(canvas, canvas.getContext("2d")!, dx, dy, isInside);
+        await check(dx, dy);
     };
 
     return (

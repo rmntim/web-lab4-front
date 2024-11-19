@@ -86,8 +86,7 @@ const apiSlice = createApi({
                 url: `auth/logout`,
                 method: "POST",
             }),
-            onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
-                await queryFulfilled;
+            onQueryStarted: async (_, { dispatch }) => {
                 dispatch(clearToken());
             },
         }),
