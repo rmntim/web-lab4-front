@@ -10,7 +10,17 @@ const Clock = () => {
         setTime(time);
     };
     setInterval(UpdateTime);
-    return <Typography variant="h6">{ctime}</Typography>;
+    return (
+        <Typography
+            style={{
+                position: "absolute",
+                left: "50%",
+                transform: "translateX(-50%)",
+            }}
+        >
+            {ctime}
+        </Typography>
+    );
 };
 
 export default Clock;

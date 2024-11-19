@@ -49,7 +49,12 @@ const Layout = () => {
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <AppBar position="static">
-                <Toolbar style={{ justifyContent: "space-between" }}>
+                <Toolbar
+                    style={{
+                        justifyContent: "space-between",
+                        position: "relative",
+                    }}
+                >
                     <Typography
                         variant="h6"
                         sx={{ cursor: "pointer" }}
