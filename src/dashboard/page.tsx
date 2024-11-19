@@ -38,11 +38,14 @@ const Page = () => {
     );
     const navigate = useNavigate();
 
-    if (!isAuthenticated) {
-        navigate("/login");
-    } else {
-        return <Dashboard />;
-    }
+    useEffect(() => {
+        if (!isAuthenticated) {
+            navigate("/login");
+        }
+    }, [isAuthenticated, navigate]);
+
+    if (!isAuthenticated) return null;
+    return <Dashboard />;
 };
 
 const Dashboard = () => {

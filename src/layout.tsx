@@ -13,6 +13,7 @@ import { Brightness4, Brightness7 } from "@mui/icons-material";
 import { Outlet, useNavigate } from "react-router-dom";
 import { clearToken, RootState, useLogoutUserMutation } from "./store";
 import { useDispatch, useSelector } from "react-redux";
+import Clock from "./clock";
 
 const Layout = () => {
     const navigate = useNavigate();
@@ -48,38 +49,42 @@ const Layout = () => {
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <AppBar position="static">
-                <Toolbar>
+                <Toolbar style={{ justifyContent: "space-between" }}>
                     <Typography
                         variant="h6"
-                        sx={{ flexGrow: 1, cursor: "pointer" }}
+                        sx={{ cursor: "pointer" }}
                         onClick={() => navigate("/")}
                     >
                         Labwork 4
                     </Typography>
 
-                    {isAuthenticated ? (
-                        <Button color="inherit" onClick={handleLogout}>
-                            Logout
-                        </Button>
-                    ) : (
-                        <>
-                            <Button
-                                color="inherit"
-                                onClick={() => navigate("/login")}
-                            >
-                                Login
+                    <Clock />
+
+                    <div>
+                        {isAuthenticated ? (
+                            <Button color="inherit" onClick={handleLogout}>
+                                Logout
                             </Button>
-                            <Button
-                                color="inherit"
-                                onClick={() => navigate("/signup")}
-                            >
-                                Signup
-                            </Button>
-                        </>
-                    )}
-                    <IconButton color="inherit" onClick={toggleTheme}>
-                        {darkMode ? <Brightness7 /> : <Brightness4 />}
-                    </IconButton>
+                        ) : (
+                            <>
+                                <Button
+                                    color="inherit"
+                                    onClick={() => navigate("/login")}
+                                >
+                                    Login
+                                </Button>
+                                <Button
+                                    color="inherit"
+                                    onClick={() => navigate("/signup")}
+                                >
+                                    Signup
+                                </Button>
+                            </>
+                        )}
+                        <IconButton color="inherit" onClick={toggleTheme}>
+                            {darkMode ? <Brightness7 /> : <Brightness4 />}
+                        </IconButton>
+                    </div>
                 </Toolbar>
             </AppBar>
             <Outlet />
