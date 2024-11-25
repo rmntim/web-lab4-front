@@ -65,6 +65,10 @@ const apiSlice = createApi({
                 method: "POST",
                 body: { ...user },
             }),
+            onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+                const result = await queryFulfilled;
+                dispatch(setToken(result.data.token));
+            },
         }),
         signupUser: builder.mutation<SignupUserResult, SignupUser>({
             query: (user) => ({
@@ -72,12 +76,19 @@ const apiSlice = createApi({
                 method: "POST",
                 body: { ...user },
             }),
+            onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+                const result = await queryFulfilled;
+                dispatch(setToken(result.data.token));
+            },
         }),
         logoutUser: builder.mutation<void, void>({
             query: () => ({
                 url: `auth/logout`,
                 method: "POST",
             }),
+            onQueryStarted: async (_, { dispatch }) => {
+                dispatch(clearToken());
+            },
         }),
 
         getUserPoints: builder.query<PointResult[], void>({
@@ -98,6 +109,13 @@ const apiSlice = createApi({
                 method: "DELETE",
             }),
         }),
+        deleteUserPoint: builder.mutation<void, PointResult>({
+            query: (point) => ({
+                url: "user/points",
+                method: "PATCH",
+                body: { ...point },
+            }),
+        }),
     }),
 });
 
@@ -109,6 +127,7 @@ export const {
     useGetUserPointsQuery,
     useAddUserPointMutation,
     useDeleteAllUserPointsMutation,
+    useDeleteUserPointMutation,
 } = apiSlice;
 
 // Configure the store

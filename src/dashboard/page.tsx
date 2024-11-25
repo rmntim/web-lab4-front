@@ -15,88 +15,76 @@ import {
     DialogContent,
     DialogActions,
     DialogContentText,
+    IconButton,
+    Snackbar,
+    Alert,
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import {
     RootState,
     useAddUserPointMutation,
     useDeleteAllUserPointsMutation,
+    useDeleteUserPointMutation,
     useGetUserPointsQuery,
 } from "../store";
 import { Navigate } from "react-router-dom";
 import { PointResult } from "../globals";
 import Canvas from "./canvas";
+import { DeleteOutline } from "@mui/icons-material";
 
 const Page = () => {
     const isAuthenticated = useSelector(
         (state: RootState) => state.jwt.token !== null
     );
+    const { data, error: queryError } = useGetUserPointsQuery();
 
-    if (!isAuthenticated) {
-        return <Navigate to="/login" />;
-    } else {
-        return <Dashboard />;
-    }
-};
-
-const Dashboard = () => {
     const [points, setPoints] = useState<PointResult[]>([]);
-    const { data } = useGetUserPointsQuery();
 
     useEffect(() => setPoints(data ?? []), [data]);
 
-    const [x, setX] = useState("");
-    const [y, setY] = useState("");
-    const [r, setR] = useState("3");
-    const [error, setError] = useState<{ x: string; y: string; r: string }>({
-        x: "",
-        y: "",
-        r: "",
-    });
+    const [x, setX] = useState(0);
+    const [y, setY] = useState(0);
+    const [r, setR] = useState(3);
     const [addUserPoint] = useAddUserPointMutation();
     const [deleteAllUserPoints] = useDeleteAllUserPointsMutation();
+    const [deleteUserPoint] = useDeleteUserPointMutation();
 
     const [deleteAllOpen, setDeleteAllOpen] = useState(false);
+
+    const [toastOpen, setToastOpen] = useState(false);
+    const [toastMessage, setToastMessage] = useState("");
+
+    const handleToastClose = () => {
+        setToastOpen(false);
+        setToastMessage("");
+    };
+
+    const toast = (message: string) => {
+        setToastOpen(true);
+        setToastMessage(message);
+    };
 
     const handleDeleteAllClose = () => {
         setDeleteAllOpen(false);
     };
 
-    const validateInput = () => {
-        setError({ x: "", y: "", r: "" });
-
-        const numX = parseFloat(x);
-        const numY = parseFloat(y);
-        const numR = parseFloat(r);
-
-        if (isNaN(numX) || numX < -3 || numX > 3) {
-            setError((err) => ({ ...err, x: "X must be between -3 and 3" }));
-        }
-        if (isNaN(numY) || numY < -3 || numY > 3) {
-            setError((err) => ({ ...err, y: "Y must be between -3 and 3" }));
-        }
-        if (isNaN(numR) || numR < 0 || numR > 3) {
-            setError((err) => ({ ...err, r: "R must be between 0 and 3" }));
+    const sendPoint = async (x: number, y: number, r: number) => {
+        try {
+            const point = await addUserPoint({
+                x,
+                y,
+                r,
+            }).unwrap();
+            setPoints((prev) => [...prev, point]);
+        } catch (err) {
+            toast("Failed to add point");
+            console.error("Failed to add point", err);
         }
     };
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        validateInput();
-        if (error.x || error.y || error.r) {
-            return;
-        }
-
-        try {
-            const point = await addUserPoint({
-                x: parseFloat(x),
-                y: parseFloat(y),
-                r: parseFloat(r),
-            }).unwrap();
-            setPoints((prev) => [...prev, point]);
-        } catch (err) {
-            console.error("Failed to add point", err);
-        }
+        await sendPoint(x, y, r);
     };
 
     const handleDeleteAll = async () => {
@@ -105,30 +93,31 @@ const Dashboard = () => {
             setPoints([]);
             setDeleteAllOpen(false);
         } catch (err) {
+            toast("Failed to delete all points");
             console.error("Failed to delete all points", err);
         }
     };
 
-    const checkPoint = (x: number, y: number) => {
-        let result = false;
+    const handleDeletePoint = async (point: PointResult, index: number) => {
         try {
-            addUserPoint({
-                x,
-                y,
-                r: parseFloat(r),
-            })
-                .unwrap()
-                .then((point) =>
-                    setPoints((prev) => {
-                        result = point.result;
-                        return [...prev, point];
-                    })
-                );
+            await deleteUserPoint(point).unwrap();
+            setPoints((prev) => prev.filter((_, i) => i !== index));
         } catch (err) {
-            console.error("Failed to add point", err);
+            toast("Failed to delete point");
+            console.error("Failed to delete point", err);
         }
-        return result;
     };
+
+    const checkPoint = async (x: number, y: number) => {
+        await sendPoint(x, y, r);
+    };
+
+    if (
+        !isAuthenticated ||
+        (queryError && "status" in queryError && queryError.status === 401)
+    ) {
+        return <Navigate to="/login" />;
+    }
 
     return (
         <Container
@@ -158,24 +147,30 @@ const Dashboard = () => {
                 >
                     <TextField
                         label="X"
+                        type="number"
                         value={x}
-                        onChange={(e) => setX(e.target.value)}
-                        error={!!error.x}
-                        helperText={error.x}
+                        onChange={(e) => setX(Number(e.target.value))}
+                        slotProps={{
+                            htmlInput: { min: -3, max: 3, step: "any" },
+                        }}
                     />
                     <TextField
                         label="Y"
+                        type="number"
                         value={y}
-                        onChange={(e) => setY(e.target.value)}
-                        error={!!error.y}
-                        helperText={error.y}
+                        onChange={(e) => setY(Number(e.target.value))}
+                        slotProps={{
+                            htmlInput: { min: -3, max: 3, step: "any" },
+                        }}
                     />
                     <TextField
                         label="R"
+                        type="number"
                         value={r}
-                        onChange={(e) => setR(e.target.value)}
-                        error={!!error.r}
-                        helperText={error.r}
+                        onChange={(e) => setR(Number(e.target.value))}
+                        slotProps={{
+                            htmlInput: { min: 0, max: 3, step: "any" },
+                        }}
                     />
                     <Button variant="contained" color="primary" type="submit">
                         Submit
@@ -222,6 +217,7 @@ const Dashboard = () => {
                             <TableCell>Y</TableCell>
                             <TableCell>R</TableCell>
                             <TableCell>Result</TableCell>
+                            <TableCell>Delete</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -233,11 +229,29 @@ const Dashboard = () => {
                                 <TableCell>
                                     {point.result ? "True" : "False"}
                                 </TableCell>
+                                <TableCell>
+                                    <IconButton
+                                        type="button"
+                                        color="error"
+                                        onClick={() =>
+                                            handleDeletePoint(point, index)
+                                        }
+                                    >
+                                        <DeleteOutline />
+                                    </IconButton>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </TableContainer>
+            <Snackbar
+                open={toastOpen}
+                autoHideDuration={6000}
+                onClose={handleToastClose}
+            >
+                <Alert severity="error">{toastMessage}</Alert>
+            </Snackbar>
         </Container>
     );
 };

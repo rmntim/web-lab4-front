@@ -9,13 +9,11 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-import { useDispatch } from "react-redux";
-import { setToken, useSignupUserMutation } from "../store";
+import { useSignupUserMutation } from "../store";
 import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
     const [error, setError] = useState("");
-    const dispatch = useDispatch();
     const navigate = useNavigate();
     const [signupUser] = useSignupUserMutation();
 
@@ -25,20 +23,15 @@ const Signup = () => {
         password: string
     ) => {
         try {
-            const { token } = await signupUser({
+            await signupUser({
                 email,
                 username,
                 password,
             }).unwrap();
-            dispatch(setToken(token));
             navigate("/dashboard");
         } catch (err) {
             console.error("Failed to signup", err);
-            setError(
-                err.data.message ||
-                    err.data.errorMessage ||
-                    "Signup failed. Please try again."
-            );
+            setError("Signup failed. Please try again.");
         }
     };
 
