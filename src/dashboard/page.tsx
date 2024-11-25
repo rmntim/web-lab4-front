@@ -36,7 +36,7 @@ const Page = () => {
     const isAuthenticated = useSelector(
         (state: RootState) => state.jwt.token !== null
     );
-    const { data, queryError } = useGetUserPointsQuery();
+    const { data, error: queryError } = useGetUserPointsQuery();
 
     const [points, setPoints] = useState<PointResult[]>([]);
 
@@ -45,11 +45,6 @@ const Page = () => {
     const [x, setX] = useState(0);
     const [y, setY] = useState(0);
     const [r, setR] = useState(3);
-    const [error, setError] = useState<{ x: string; y: string; r: string }>({
-        x: "",
-        y: "",
-        r: "",
-    });
     const [addUserPoint] = useAddUserPointMutation();
     const [deleteAllUserPoints] = useDeleteAllUserPointsMutation();
     const [deleteUserPoint] = useDeleteUserPointMutation();
@@ -81,31 +76,14 @@ const Page = () => {
                 r,
             }).unwrap();
             setPoints((prev) => [...prev, point]);
-            return point.result;
         } catch (err) {
             toast("Failed to add point");
             console.error("Failed to add point", err);
         }
-        return false;
     };
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setError({ x: "", y: "", r: "" });
-
-        if (x < -3 || x > 3) {
-            setError((err) => ({ ...err, x: "X must be between -3 and 3" }));
-            return;
-        }
-        if (y < -3 || y > 3) {
-            setError((err) => ({ ...err, y: "Y must be between -3 and 3" }));
-            return;
-        }
-        if (r < 0 || r > 3) {
-            setError((err) => ({ ...err, r: "R must be between 0 and 3" }));
-            return;
-        }
-
         await sendPoint(x, y, r);
     };
 
@@ -136,7 +114,7 @@ const Page = () => {
 
     if (
         !isAuthenticated ||
-        (error && "status" in error && error.status === 401)
+        (queryError && "status" in queryError && queryError.status === 401)
     ) {
         return <Navigate to="/login" />;
     }
@@ -171,28 +149,28 @@ const Page = () => {
                         label="X"
                         type="number"
                         value={x}
-                        onChange={(e) => {
-                            setX(Number(e.target.value));
-                            console.log(x);
+                        onChange={(e) => setX(Number(e.target.value))}
+                        slotProps={{
+                            htmlInput: { min: -3, max: 3, step: "any" },
                         }}
-                        error={!!error.x}
-                        helperText={error.x}
                     />
                     <TextField
                         label="Y"
                         type="number"
                         value={y}
                         onChange={(e) => setY(Number(e.target.value))}
-                        error={!!error.y}
-                        helperText={error.y}
+                        slotProps={{
+                            htmlInput: { min: -3, max: 3, step: "any" },
+                        }}
                     />
                     <TextField
                         label="R"
                         type="number"
                         value={r}
                         onChange={(e) => setR(Number(e.target.value))}
-                        error={!!error.r}
-                        helperText={error.r}
+                        slotProps={{
+                            htmlInput: { min: 0, max: 3, step: "any" },
+                        }}
                     />
                     <Button variant="contained" color="primary" type="submit">
                         Submit
