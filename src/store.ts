@@ -1,31 +1,6 @@
-import { createSlice, configureStore, PayloadAction } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { Point, PointResult } from "./globals";
-
-interface JwtState {
-    token: string | null;
-}
-
-const initialState: JwtState = {
-    token: localStorage.getItem("token"),
-};
-
-const jwtSlice = createSlice({
-    name: "jwt",
-    initialState,
-    reducers: {
-        setToken: (state, action: PayloadAction<string>) => {
-            state.token = action.payload;
-            localStorage.setItem("token", action.payload);
-        },
-        clearToken: (state) => {
-            state.token = null;
-            localStorage.removeItem("token");
-        },
-    },
-});
-
-export const { setToken, clearToken } = jwtSlice.actions;
 
 type LoginUser = {
     email: string;
@@ -46,13 +21,7 @@ const apiSlice = createApi({
     reducerPath: "api",
     baseQuery: fetchBaseQuery({
         baseUrl: `${import.meta.env.VITE_API_URL}/api`,
-        prepareHeaders: (headers, { getState }) => {
-            const token = (getState() as RootState).jwt.token;
-            if (token !== null) {
-                headers.set("Authorization", `Bearer ${token}`);
-            }
-            return headers;
-        },
+        credentials: "include",
     }),
     endpoints: (builder) => ({
         loginUser: builder.mutation<LoginUserResult, LoginUser>({
@@ -61,10 +30,6 @@ const apiSlice = createApi({
                 method: "POST",
                 body: { ...user },
             }),
-            onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
-                const result = await queryFulfilled;
-                dispatch(setToken(result.data.token));
-            },
         }),
         signupUser: builder.mutation<SignupUserResult, SignupUser>({
             query: (user) => ({
@@ -72,19 +37,12 @@ const apiSlice = createApi({
                 method: "POST",
                 body: { ...user },
             }),
-            onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
-                const result = await queryFulfilled;
-                dispatch(setToken(result.data.token));
-            },
         }),
         logoutUser: builder.mutation<void, void>({
             query: () => ({
                 url: `auth/logout`,
                 method: "POST",
             }),
-            onQueryStarted: async (_, { dispatch }) => {
-                dispatch(clearToken());
-            },
         }),
 
         getUserPoints: builder.query<PointResult[], void>({
@@ -120,7 +78,7 @@ export const {
     useSignupUserMutation,
     useLogoutUserMutation,
 
-    useGetUserPointsQuery,
+    useLazyGetUserPointsQuery,
     useAddUserPointMutation,
     useDeleteAllUserPointsMutation,
     useDeleteUserPointMutation,
@@ -129,7 +87,6 @@ export const {
 // Configure the store
 const store = configureStore({
     reducer: {
-        jwt: jwtSlice.reducer,
         [apiSlice.reducerPath]: apiSlice.reducer,
     },
     middleware: (getDefaultMiddleware) =>
