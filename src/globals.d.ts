@@ -6,4 +6,5 @@ export type Point = {
 
 export type PointResult = Point & {
     result: boolean;
+    userId: number;
 };

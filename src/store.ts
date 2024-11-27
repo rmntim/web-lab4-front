@@ -2,17 +2,14 @@ import { createSlice, configureStore, PayloadAction } from "@reduxjs/toolkit";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { Point, PointResult } from "./globals";
 
-// Define the initial state type
 interface JwtState {
     token: string | null;
 }
 
-// Initial state for the JWT slice
 const initialState: JwtState = {
     token: localStorage.getItem("token"),
 };
 
-// JWT slice
 const jwtSlice = createSlice({
     name: "jwt",
     initialState,
@@ -45,7 +42,6 @@ type SignupUser = LoginUser & {
 
 type SignupUserResult = LoginUserResult;
 
-// API slice using createApi
 const apiSlice = createApi({
     reducerPath: "api",
     baseQuery: fetchBaseQuery({

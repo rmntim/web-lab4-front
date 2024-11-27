@@ -21,7 +21,7 @@ import {
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import {
-    RootState,
+    type RootState,
     useAddUserPointMutation,
     useDeleteAllUserPointsMutation,
     useDeleteUserPointMutation,
