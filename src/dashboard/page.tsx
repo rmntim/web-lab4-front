@@ -122,10 +122,10 @@ const Page = () => {
                     width: "100%",
                     padding: "2rem",
                     display: "flex",
-                    flexDirection: "row",
+                    flexDirection: "column",
                     gap: "4rem",
                     justifyContent: "center",
-                    alignItems: "start",
+                    alignItems: "center",
                 }}
             >
                 <Typography variant="h5" gutterBottom>

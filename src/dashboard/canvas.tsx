@@ -23,13 +23,22 @@ const Canvas = ({
     const sign = r >= 0 ? 1 : -1;
     const radius = Math.abs(r);
 
+    const colorFromUserId = (result: boolean, userId: number) => {
+        const red = Math.floor(Math.floor(userId / 256) / 256) % 256;
+        const green = Math.floor(Math.floor(userId / 256) % 256);
+        const blue = Math.floor(userId % 256);
+
+        return `rgba(${red}, ${green}, ${blue}, ${result ? 1 : 0.5})`;
+    }
+
     const addPoint = useCallback(
         (
             canvas: HTMLCanvasElement,
             ctx: CanvasRenderingContext2D,
             x: number,
             y: number,
-            result: boolean
+            result: boolean,
+            userId: typeof points[number]["userId"]
         ) => {
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
@@ -40,12 +49,10 @@ const Canvas = ({
             ctx.beginPath();
             ctx.arc(actualX, actualY, 3, 0, 2 * Math.PI, true);
             ctx.closePath();
-            ctx.fillStyle = result
-                ? theme.palette.success.main
-                : theme.palette.error.main;
+            ctx.fillStyle = colorFromUserId(result, userId);
             ctx.fill();
         },
-        [MULTIPLIER, theme]
+        [MULTIPLIER]
     );
 
     useEffect(() => {
@@ -104,7 +111,7 @@ const Canvas = ({
         ctx.stroke();
 
         points.forEach((point) => {
-            addPoint(canvas, ctx, point.x, point.y, point.result);
+            addPoint(canvas, ctx, point.x, point.y, point.result, point.userId);
         });
     }, [radius, width, height, theme, MULTIPLIER, sign, points, addPoint]);
 
