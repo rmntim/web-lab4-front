@@ -17,10 +17,16 @@ type SignupUser = LoginUser & {
 
 type SignupUserResult = LoginUserResult;
 
+type UserInfo = {
+    username: string;
+    email: string;
+    avatarURL: string;
+};
+
 const apiSlice = createApi({
     reducerPath: "api",
     baseQuery: fetchBaseQuery({
-        baseUrl: `${import.meta.env.VITE_API_URL}/api`,
+        baseUrl: `${import.meta.env.VITE_API_URL}/api/v1`,
         credentials: "include",
     }),
     endpoints: (builder) => ({
@@ -44,28 +50,33 @@ const apiSlice = createApi({
                 method: "POST",
             }),
         }),
+        getUserInfo: builder.query<UserInfo, void>({
+            query: () => ({
+                url: `users/`,
+            }),
+        }),
 
         getUserPoints: builder.query<PointResult[], void>({
             query: () => ({
-                url: `user/points`,
+                url: `points`,
             }),
         }),
         addUserPoint: builder.mutation<PointResult, Point>({
             query: (point) => ({
-                url: `user/points`,
+                url: `points`,
                 method: "POST",
                 body: { ...point },
             }),
         }),
         deleteAllUserPoints: builder.mutation<void, void>({
             query: () => ({
-                url: `user/points`,
+                url: `points`,
                 method: "DELETE",
             }),
         }),
         deleteUserPoint: builder.mutation<void, PointResult>({
             query: (point) => ({
-                url: "user/points",
+                url: "points",
                 method: "PATCH",
                 body: { ...point },
             }),
@@ -77,6 +88,7 @@ export const {
     useLoginUserMutation,
     useSignupUserMutation,
     useLogoutUserMutation,
+    useLazyGetUserInfoQuery,
 
     useLazyGetUserPointsQuery,
     useAddUserPointMutation,

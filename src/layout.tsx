@@ -8,7 +8,7 @@ import {
     Toolbar,
     Typography,
 } from "@mui/material";
-import { Brightness4, Brightness7 } from "@mui/icons-material";
+import { AccountCircle, Brightness4, Brightness7 } from "@mui/icons-material";
 import { Outlet, useNavigate } from "react-router-dom";
 import Clock from "./clock";
 
@@ -47,9 +47,17 @@ const Layout = () => {
 
                     <Clock />
 
-                    <IconButton color="inherit" onClick={toggleTheme}>
-                        {darkMode ? <Brightness7 /> : <Brightness4 />}
-                    </IconButton>
+                    <div>
+                        <IconButton color="inherit" onClick={toggleTheme}>
+                            {darkMode ? <Brightness7 /> : <Brightness4 />}
+                        </IconButton>
+                        <IconButton
+                            color="inherit"
+                            onClick={() => navigate("/profile")}
+                        >
+                            <AccountCircle />
+                        </IconButton>
+                    </div>
                 </Toolbar>
             </AppBar>
             <Outlet />
