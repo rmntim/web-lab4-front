@@ -1,6 +1,6 @@
 import { MouseEvent, useCallback, useEffect, useRef } from "react";
 import { useTheme } from "@mui/material";
-import { PointResult } from "../globals";
+import { hashUserIdForColor, PointResult } from "../globals";
 
 type CanvasProps = {
     radius: number;
@@ -24,12 +24,16 @@ const Canvas = ({
     const radius = Math.abs(r);
 
     const colorFromUserId = (result: boolean, userId: number) => {
-        const red = Math.floor(Math.floor(userId / 256) / 256) % 256;
-        const green = Math.floor(Math.floor(userId / 256) % 256);
-        const blue = Math.floor(userId % 256);
+        const colorCode = hashUserIdForColor(userId);
+
+        const red = Math.floor(Math.floor(colorCode / 256) / 256) % 256;
+        const green = Math.floor(Math.floor(colorCode / 256) % 256);
+        const blue = Math.floor(colorCode % 256);
+
+        console.log(red, green, blue);
 
         return `rgba(${red}, ${green}, ${blue}, ${result ? 1 : 0.5})`;
-    }
+    };
 
     const addPoint = useCallback(
         (
@@ -38,7 +42,7 @@ const Canvas = ({
             x: number,
             y: number,
             result: boolean,
-            userId: typeof points[number]["userId"]
+            userId: (typeof points)[number]["userId"]
         ) => {
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
