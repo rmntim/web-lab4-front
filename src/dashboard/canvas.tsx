@@ -39,13 +39,12 @@ const Canvas = ({
         (
             canvas: HTMLCanvasElement,
             ctx: CanvasRenderingContext2D,
-            x: number,
-            y: number,
-            result: boolean,
-            userId: (typeof points)[number]["userId"]
+            point: PointResult
         ) => {
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
+
+            const { x, y, result, userId } = point;
 
             const actualX = x * MULTIPLIER + centerX;
             const actualY = centerY - y * MULTIPLIER;
@@ -115,7 +114,7 @@ const Canvas = ({
         ctx.stroke();
 
         points.forEach((point) => {
-            addPoint(canvas, ctx, point.x, point.y, point.result, point.userId);
+            addPoint(canvas, ctx, point);
         });
     }, [radius, width, height, theme, MULTIPLIER, sign, points, addPoint]);
 
