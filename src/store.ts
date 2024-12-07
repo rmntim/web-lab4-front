@@ -1,27 +1,34 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { Point, PointResult } from "./globals";
+import { Point, PointResult, UserInfo } from "./globals";
 
 type LoginUser = {
     email: string;
     password: string;
 };
 
-type LoginUserResult = {
-    token: string;
-};
-
 type SignupUser = LoginUser & {
     username: string;
 };
 
-type SignupUserResult = LoginUserResult;
-
-type UserInfo = {
-    username: string;
-    email: string;
-    avatarURL: string;
+const userStoreInitialState: UserInfo = {
+    userId: 0,
+    username: "",
+    email: "",
+    avatarURL: "",
 };
+
+const userSlice = createSlice({
+    name: "user",
+    initialState: userStoreInitialState,
+    reducers: {
+        updateUserInfo: (state, action: PayloadAction<UserInfo>) => {
+            state.username = action.payload.username;
+            state.email = action.payload.email;
+            state.userId = action.payload.userId;
+        },
+    },
+});
 
 const apiSlice = createApi({
     reducerPath: "api",
@@ -30,25 +37,38 @@ const apiSlice = createApi({
         credentials: "include",
     }),
     endpoints: (builder) => ({
-        loginUser: builder.mutation<LoginUserResult, LoginUser>({
+        loginUser: builder.mutation<UserInfo, LoginUser>({
             query: (user) => ({
                 url: `auth/login`,
                 method: "POST",
                 body: { ...user },
             }),
+            onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+                const { data: result } = await queryFulfilled;
+                dispatch(userSlice.actions.updateUserInfo(result));
+            },
         }),
-        signupUser: builder.mutation<SignupUserResult, SignupUser>({
+        signupUser: builder.mutation<UserInfo, SignupUser>({
             query: (user) => ({
                 url: `auth/signup`,
                 method: "POST",
                 body: { ...user },
             }),
+            onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+                const { data: result } = await queryFulfilled;
+                dispatch(userSlice.actions.updateUserInfo(result));
+            },
         }),
         logoutUser: builder.mutation<void, void>({
             query: () => ({
                 url: `auth/logout`,
                 method: "POST",
             }),
+            onQueryStarted: (_, { dispatch }) => {
+                dispatch(
+                    userSlice.actions.updateUserInfo(userStoreInitialState)
+                );
+            },
         }),
         getUserInfo: builder.query<UserInfo, void>({
             query: () => ({
@@ -100,6 +120,7 @@ export const {
 const store = configureStore({
     reducer: {
         [apiSlice.reducerPath]: apiSlice.reducer,
+        [userSlice.reducerPath]: userSlice.reducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(apiSlice.middleware),
