@@ -12,10 +12,10 @@ type SignupUser = LoginUser & {
 };
 
 const userStoreInitialState: UserInfo = {
-    userId: 0,
+    id: 0,
     username: "",
     email: "",
-    avatarURL: "",
+    avatarUrl: "",
 };
 
 const userSlice = createSlice({
@@ -23,9 +23,10 @@ const userSlice = createSlice({
     initialState: userStoreInitialState,
     reducers: {
         updateUserInfo: (state, action: PayloadAction<UserInfo>) => {
+            state.id = action.payload.id;
             state.username = action.payload.username;
             state.email = action.payload.email;
-            state.userId = action.payload.userId;
+            state.avatarUrl = action.payload.avatarUrl;
         },
     },
 });

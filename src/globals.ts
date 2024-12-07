@@ -5,15 +5,15 @@ export type Point = {
 };
 
 export type PointResult = Point &
-    Pick<UserInfo, "userId"> & {
+    Pick<UserInfo, "id"> & {
         result: boolean;
     };
 
 export type UserInfo = {
-    userId: number;
+    id: number;
     username: string;
     email: string;
-    avatarURL: string;
+    avatarUrl: string;
 };
 
 export const hashUserIdForColor = (userId: number) => {
