@@ -23,7 +23,7 @@ const Login = () => {
     const handleLogin = async (email: string, password: string) => {
         try {
             await loginUser({ email, password }).unwrap();
-            navigate("/dashboard");
+            navigate("/", { flushSync: true });
         } catch (err) {
             console.error("Failed to login", err);
             setError("Login failed. Please try again.");

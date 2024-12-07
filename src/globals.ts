@@ -4,10 +4,10 @@ export type Point = {
     r: number;
 };
 
-export type PointResult = Point &
-    Pick<UserInfo, "id"> & {
-        result: boolean;
-    };
+export type PointResult = Point & {
+    result: boolean;
+    userId: UserInfo["id"];
+};
 
 export type UserInfo = {
     id: number;

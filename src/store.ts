@@ -11,22 +11,17 @@ type SignupUser = LoginUser & {
     username: string;
 };
 
-const userStoreInitialState: UserInfo = {
-    id: 0,
-    username: "",
-    email: "",
-    avatarUrl: "",
-};
+const userStoreInitialState: UserInfo = JSON.parse(
+    localStorage.getItem("userStore") ?? "{}"
+);
 
 const userSlice = createSlice({
     name: "user",
     initialState: userStoreInitialState,
     reducers: {
-        updateUserInfo: (state, action: PayloadAction<UserInfo>) => {
-            state.id = action.payload.id;
-            state.username = action.payload.username;
-            state.email = action.payload.email;
-            state.avatarUrl = action.payload.avatarUrl;
+        updateUserInfo: (_, action: PayloadAction<UserInfo>) => {
+            localStorage.setItem("userStore", JSON.stringify(action.payload));
+            return action.payload;
         },
     },
 });
@@ -73,7 +68,7 @@ const apiSlice = createApi({
         }),
         getUserInfo: builder.query<UserInfo, void>({
             query: () => ({
-                url: `users/`,
+                url: `users`,
             }),
         }),
 

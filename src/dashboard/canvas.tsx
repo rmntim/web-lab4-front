@@ -30,8 +30,6 @@ const Canvas = ({
         const green = Math.floor(Math.floor(colorCode / 256) % 256);
         const blue = Math.floor(colorCode % 256);
 
-        console.log(red, green, blue);
-
         return `rgba(${red}, ${green}, ${blue}, ${result ? 1 : 0.33})`;
     };
 
@@ -44,7 +42,7 @@ const Canvas = ({
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
 
-            const { x, y, result, id: userId } = point;
+            const { x, y, result, userId } = point;
 
             const actualX = x * MULTIPLIER + centerX;
             const actualY = centerY - y * MULTIPLIER;

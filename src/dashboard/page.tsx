@@ -21,6 +21,7 @@ import {
     Typography,
 } from "@mui/material";
 import {
+    RootState,
     useAddUserPointMutation,
     useDeleteAllUserPointsMutation,
     useDeleteUserPointMutation,
@@ -30,9 +31,12 @@ import { Navigate } from "react-router-dom";
 import { PointResult } from "../globals";
 import Canvas from "./canvas";
 import { DeleteOutline } from "@mui/icons-material";
+import { useSelector } from "react-redux";
 
 const Page = () => {
     const [trigger, { error }] = useLazyGetUserPointsQuery();
+
+    const userId = useSelector((state: RootState) => state.user.id);
 
     const [points, setPoints] = useState<PointResult[]>([]);
 
@@ -75,6 +79,7 @@ const Page = () => {
                 y,
                 r,
             }).unwrap();
+            console.log(point);
             setPoints((prev) => [...prev, point]);
         } catch (err) {
             toast("Failed to add point");
@@ -90,8 +95,10 @@ const Page = () => {
     const handleDeleteAll = async () => {
         try {
             await deleteAllUserPoints().unwrap();
+            setPoints((points) =>
+                [...points].filter((p) => p.userId !== userId)
+            );
             setDeleteAllOpen(false);
-            location.reload();
         } catch (err) {
             toast("Failed to delete all points");
             console.error("Failed to delete all points", err);
@@ -251,6 +258,7 @@ const Page = () => {
                                         onClick={() =>
                                             handleDeletePoint(point, index)
                                         }
+                                        disabled={point.userId !== userId}
                                     >
                                         <DeleteOutline />
                                     </IconButton>
