@@ -32,7 +32,7 @@ const Canvas = ({
 
         console.log(red, green, blue);
 
-        return `rgba(${red}, ${green}, ${blue}, ${result ? 1 : 0.5})`;
+        return `rgba(${red}, ${green}, ${blue}, ${result ? 1 : 0.33})`;
     };
 
     const addPoint = useCallback(
