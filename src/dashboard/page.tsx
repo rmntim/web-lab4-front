@@ -90,8 +90,8 @@ const Page = () => {
     const handleDeleteAll = async () => {
         try {
             await deleteAllUserPoints().unwrap();
-            setPoints([]);
             setDeleteAllOpen(false);
+            location.reload();
         } catch (err) {
             toast("Failed to delete all points");
             console.error("Failed to delete all points", err);
