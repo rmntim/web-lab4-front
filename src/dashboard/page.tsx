@@ -17,6 +17,7 @@ import {
     DialogContentText,
     IconButton,
     Typography,
+    Tooltip,
 } from "@mui/material";
 import {
     RootState,
@@ -28,9 +29,10 @@ import {
 import { Navigate } from "react-router-dom";
 import { PointResult } from "../globals";
 import Canvas from "./canvas";
-import { DeleteOutline } from "@mui/icons-material";
+import { DeleteOutline, Info } from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import { toast } from "mui-sonner";
+import UserTooltip from "./user-tooltip";
 
 const Page = () => {
     const [trigger, { error }] = useLazyGetUserPointsQuery();
@@ -226,6 +228,7 @@ const Page = () => {
                             <TableCell>R</TableCell>
                             <TableCell>Result</TableCell>
                             <TableCell>Delete</TableCell>
+                            <TableCell>User</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -248,6 +251,19 @@ const Page = () => {
                                     >
                                         <DeleteOutline />
                                     </IconButton>
+                                </TableCell>
+                                <TableCell>
+                                    <Tooltip
+                                        title={
+                                            <UserTooltip
+                                                userId={point.userId}
+                                            />
+                                        }
+                                    >
+                                        <IconButton>
+                                            <Info />
+                                        </IconButton>
+                                    </Tooltip>
                                 </TableCell>
                             </TableRow>
                         ))}

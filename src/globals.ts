@@ -37,7 +37,7 @@ export const isBackendError = (error: unknown): error is BackendError => {
     return false;
 };
 
-export const hashUserIdForColor = (userId: number) => {
+const hashUserIdForColor = (userId: number) => {
     const prime1 = 73856093;
     const prime2 = 19349663;
     const prime3 = 83492791;
@@ -50,4 +50,14 @@ export const hashUserIdForColor = (userId: number) => {
     hash ^= prime3;
 
     return hash >>> 0;
+};
+
+export const colorFromUserId = (userId: number, result: boolean = true) => {
+    const colorCode = hashUserIdForColor(userId);
+
+    const red = Math.floor(Math.floor(colorCode / 256) / 256) % 256;
+    const green = Math.floor(Math.floor(colorCode / 256) % 256);
+    const blue = Math.floor(colorCode % 256);
+
+    return `rgba(${red}, ${green}, ${blue}, ${result ? 1 : 0.33})`;
 };

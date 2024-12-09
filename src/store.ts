@@ -79,6 +79,11 @@ const apiSlice = createApi({
                 url: `users`,
             }),
         }),
+        getUserInfoById: builder.query<UserInfo, UserInfo["id"]>({
+            query: (id) => ({
+                url: `users/${id}`,
+            }),
+        }),
         updateUserInfo: builder.mutation<UserInfo, UpdateUserInfo>({
             query: (user) => ({
                 url: `users`,
@@ -149,6 +154,7 @@ export const {
     useLogoutUserMutation,
 
     useLazyGetUserInfoQuery,
+    useLazyGetUserInfoByIdQuery,
     useUpdateUserInfoMutation,
     useUpdatePasswordMutation,
     useUpdateAvatarMutation,
