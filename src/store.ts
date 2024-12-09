@@ -1,84 +1,58 @@
-import { createSlice, configureStore, PayloadAction } from "@reduxjs/toolkit";
+import { configureStore, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { Point, PointResult } from "./globals";
-
-// Define the initial state type
-interface JwtState {
-    token: string | null;
-}
-
-// Initial state for the JWT slice
-const initialState: JwtState = {
-    token: localStorage.getItem("token"),
-};
-
-// JWT slice
-const jwtSlice = createSlice({
-    name: "jwt",
-    initialState,
-    reducers: {
-        setToken: (state, action: PayloadAction<string>) => {
-            state.token = action.payload;
-            localStorage.setItem("token", action.payload);
-        },
-        clearToken: (state) => {
-            state.token = null;
-            localStorage.removeItem("token");
-        },
-    },
-});
-
-export const { setToken, clearToken } = jwtSlice.actions;
+import { Point, PointResult, UserInfo } from "./globals";
 
 type LoginUser = {
     email: string;
     password: string;
 };
 
-type LoginUserResult = {
-    token: string;
-};
-
 type SignupUser = LoginUser & {
     username: string;
 };
 
-type SignupUserResult = LoginUserResult;
+const userStoreInitialState: UserInfo = JSON.parse(
+    localStorage.getItem("userStore") ?? "{}"
+);
 
-// API slice using createApi
+const userSlice = createSlice({
+    name: "user",
+    initialState: userStoreInitialState,
+    reducers: {
+        updateUserInfo: (_, action: PayloadAction<UserInfo>) => {
+            localStorage.setItem("userStore", JSON.stringify(action.payload));
+            return action.payload;
+        },
+    },
+});
+
 const apiSlice = createApi({
     reducerPath: "api",
     baseQuery: fetchBaseQuery({
-        baseUrl: `${import.meta.env.VITE_API_URL}/api`,
-        prepareHeaders: (headers, { getState }) => {
-            const token = (getState() as RootState).jwt.token;
-            if (token !== null) {
-                headers.set("Authorization", `Bearer ${token}`);
-            }
-            return headers;
-        },
+        baseUrl: `${import.meta.env.VITE_API_URL}/api/v1`,
+        credentials: "include",
     }),
     endpoints: (builder) => ({
-        loginUser: builder.mutation<LoginUserResult, LoginUser>({
+        loginUser: builder.mutation<UserInfo, LoginUser>({
             query: (user) => ({
                 url: `auth/login`,
                 method: "POST",
                 body: { ...user },
             }),
             onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
-                const result = await queryFulfilled;
-                dispatch(setToken(result.data.token));
+                const { data: result } = await queryFulfilled;
+                dispatch(userSlice.actions.updateUserInfo(result));
             },
         }),
-        signupUser: builder.mutation<SignupUserResult, SignupUser>({
+        signupUser: builder.mutation<UserInfo, SignupUser>({
             query: (user) => ({
                 url: `auth/signup`,
                 method: "POST",
                 body: { ...user },
             }),
             onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
-                const result = await queryFulfilled;
-                dispatch(setToken(result.data.token));
+                const { data: result } = await queryFulfilled;
+                dispatch(userSlice.actions.updateUserInfo(result));
             },
         }),
         logoutUser: builder.mutation<void, void>({
@@ -86,32 +60,39 @@ const apiSlice = createApi({
                 url: `auth/logout`,
                 method: "POST",
             }),
-            onQueryStarted: async (_, { dispatch }) => {
-                dispatch(clearToken());
+            onQueryStarted: (_, { dispatch }) => {
+                dispatch(
+                    userSlice.actions.updateUserInfo(userStoreInitialState)
+                );
             },
+        }),
+        getUserInfo: builder.query<UserInfo, void>({
+            query: () => ({
+                url: `users`,
+            }),
         }),
 
         getUserPoints: builder.query<PointResult[], void>({
             query: () => ({
-                url: `user/points`,
+                url: `points`,
             }),
         }),
         addUserPoint: builder.mutation<PointResult, Point>({
             query: (point) => ({
-                url: `user/points`,
+                url: `points`,
                 method: "POST",
                 body: { ...point },
             }),
         }),
         deleteAllUserPoints: builder.mutation<void, void>({
             query: () => ({
-                url: `user/points`,
+                url: `points`,
                 method: "DELETE",
             }),
         }),
         deleteUserPoint: builder.mutation<void, PointResult>({
             query: (point) => ({
-                url: "user/points",
+                url: "points",
                 method: "PATCH",
                 body: { ...point },
             }),
@@ -123,8 +104,9 @@ export const {
     useLoginUserMutation,
     useSignupUserMutation,
     useLogoutUserMutation,
+    useLazyGetUserInfoQuery,
 
-    useGetUserPointsQuery,
+    useLazyGetUserPointsQuery,
     useAddUserPointMutation,
     useDeleteAllUserPointsMutation,
     useDeleteUserPointMutation,
@@ -133,8 +115,8 @@ export const {
 // Configure the store
 const store = configureStore({
     reducer: {
-        jwt: jwtSlice.reducer,
         [apiSlice.reducerPath]: apiSlice.reducer,
+        [userSlice.reducerPath]: userSlice.reducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(apiSlice.middleware),

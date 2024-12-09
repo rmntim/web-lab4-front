@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
     AppBar,
-    Button,
     createTheme,
     CssBaseline,
     IconButton,
@@ -9,17 +8,12 @@ import {
     Toolbar,
     Typography,
 } from "@mui/material";
-import { Brightness4, Brightness7 } from "@mui/icons-material";
+import { AccountCircle, Brightness4, Brightness7 } from "@mui/icons-material";
 import { Outlet, useNavigate } from "react-router-dom";
-import { RootState, useLogoutUserMutation } from "./store";
-import { useSelector } from "react-redux";
 import Clock from "./clock";
 
 const Layout = () => {
     const navigate = useNavigate();
-    const isAuthenticated =
-        useSelector((state: RootState) => state.jwt.token) !== null;
-    const [logoutUser] = useLogoutUserMutation();
 
     const [darkMode, setDarkMode] = useState(true);
 
@@ -31,16 +25,6 @@ const Layout = () => {
 
     const toggleTheme = () => {
         setDarkMode(!darkMode);
-    };
-
-    const handleLogout = async () => {
-        try {
-            await logoutUser().unwrap();
-        } catch (err) {
-            console.error(err);
-        } finally {
-            navigate("/");
-        }
     };
 
     return (
@@ -56,7 +40,7 @@ const Layout = () => {
                     <Typography
                         variant="h6"
                         sx={{ cursor: "pointer" }}
-                        onClick={() => navigate("/")}
+                        onClick={() => navigate("/", { replace: true })}
                     >
                         Labwork 4
                     </Typography>
@@ -64,28 +48,14 @@ const Layout = () => {
                     <Clock />
 
                     <div>
-                        {isAuthenticated ? (
-                            <Button color="inherit" onClick={handleLogout}>
-                                Logout
-                            </Button>
-                        ) : (
-                            <>
-                                <Button
-                                    color="inherit"
-                                    onClick={() => navigate("/login")}
-                                >
-                                    Login
-                                </Button>
-                                <Button
-                                    color="inherit"
-                                    onClick={() => navigate("/signup")}
-                                >
-                                    Signup
-                                </Button>
-                            </>
-                        )}
                         <IconButton color="inherit" onClick={toggleTheme}>
                             {darkMode ? <Brightness7 /> : <Brightness4 />}
+                        </IconButton>
+                        <IconButton
+                            color="inherit"
+                            onClick={() => navigate("/profile")}
+                        >
+                            <AccountCircle />
                         </IconButton>
                     </div>
                 </Toolbar>

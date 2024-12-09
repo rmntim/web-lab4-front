@@ -1,6 +1,6 @@
 import { MouseEvent, useCallback, useEffect, useRef } from "react";
 import { useTheme } from "@mui/material";
-import { PointResult } from "../globals";
+import { hashUserIdForColor, PointResult } from "../globals";
 
 type CanvasProps = {
     radius: number;
@@ -23,16 +23,26 @@ const Canvas = ({
     const sign = r >= 0 ? 1 : -1;
     const radius = Math.abs(r);
 
+    const colorFromUserId = (result: boolean, userId: number) => {
+        const colorCode = hashUserIdForColor(userId);
+
+        const red = Math.floor(Math.floor(colorCode / 256) / 256) % 256;
+        const green = Math.floor(Math.floor(colorCode / 256) % 256);
+        const blue = Math.floor(colorCode % 256);
+
+        return `rgba(${red}, ${green}, ${blue}, ${result ? 1 : 0.33})`;
+    };
+
     const addPoint = useCallback(
         (
             canvas: HTMLCanvasElement,
             ctx: CanvasRenderingContext2D,
-            x: number,
-            y: number,
-            result: boolean
+            point: PointResult
         ) => {
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
+
+            const { x, y, result, userId } = point;
 
             const actualX = x * MULTIPLIER + centerX;
             const actualY = centerY - y * MULTIPLIER;
@@ -40,12 +50,10 @@ const Canvas = ({
             ctx.beginPath();
             ctx.arc(actualX, actualY, 3, 0, 2 * Math.PI, true);
             ctx.closePath();
-            ctx.fillStyle = result
-                ? theme.palette.success.main
-                : theme.palette.error.main;
+            ctx.fillStyle = colorFromUserId(result, userId);
             ctx.fill();
         },
-        [MULTIPLIER, theme]
+        [MULTIPLIER]
     );
 
     useEffect(() => {
@@ -104,7 +112,7 @@ const Canvas = ({
         ctx.stroke();
 
         points.forEach((point) => {
-            addPoint(canvas, ctx, point.x, point.y, point.result);
+            addPoint(canvas, ctx, point);
         });
     }, [radius, width, height, theme, MULTIPLIER, sign, points, addPoint]);
 

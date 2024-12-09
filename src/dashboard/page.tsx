@@ -18,29 +18,33 @@ import {
     IconButton,
     Snackbar,
     Alert,
+    Typography,
 } from "@mui/material";
-import { useSelector } from "react-redux";
 import {
     RootState,
     useAddUserPointMutation,
     useDeleteAllUserPointsMutation,
     useDeleteUserPointMutation,
-    useGetUserPointsQuery,
+    useLazyGetUserPointsQuery,
 } from "../store";
 import { Navigate } from "react-router-dom";
 import { PointResult } from "../globals";
 import Canvas from "./canvas";
 import { DeleteOutline } from "@mui/icons-material";
+import { useSelector } from "react-redux";
 
 const Page = () => {
-    const isAuthenticated = useSelector(
-        (state: RootState) => state.jwt.token !== null
-    );
-    const { data, error: queryError } = useGetUserPointsQuery();
+    const [trigger, { error }] = useLazyGetUserPointsQuery();
+
+    const userId = useSelector((state: RootState) => state.user.id);
 
     const [points, setPoints] = useState<PointResult[]>([]);
 
-    useEffect(() => setPoints(data ?? []), [data]);
+    useEffect(() => {
+        trigger()
+            .unwrap()
+            .then((data) => setPoints(data));
+    }, [trigger]);
 
     const [x, setX] = useState(0);
     const [y, setY] = useState(0);
@@ -75,6 +79,7 @@ const Page = () => {
                 y,
                 r,
             }).unwrap();
+            console.log(point);
             setPoints((prev) => [...prev, point]);
         } catch (err) {
             toast("Failed to add point");
@@ -90,7 +95,9 @@ const Page = () => {
     const handleDeleteAll = async () => {
         try {
             await deleteAllUserPoints().unwrap();
-            setPoints([]);
+            setPoints((points) =>
+                [...points].filter((p) => p.userId !== userId)
+            );
             setDeleteAllOpen(false);
         } catch (err) {
             toast("Failed to delete all points");
@@ -112,11 +119,30 @@ const Page = () => {
         await sendPoint(x, y, r);
     };
 
-    if (
-        !isAuthenticated ||
-        (queryError && "status" in queryError && queryError.status === 401)
-    ) {
-        return <Navigate to="/login" />;
+    if (error) {
+        if ("status" in error && error.status === 401) {
+            return <Navigate to="/login" />;
+        }
+        return (
+            <Container
+                style={{
+                    width: "100%",
+                    padding: "2rem",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "4rem",
+                    justifyContent: "center",
+                    alignItems: "center",
+                }}
+            >
+                <Typography variant="h5" gutterBottom>
+                    Error
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                    Failed to load points
+                </Typography>
+            </Container>
+        );
     }
 
     return (
@@ -132,11 +158,7 @@ const Page = () => {
             }}
         >
             <div>
-                <Canvas
-                    radius={Math.min(Math.max(Number(r), 0), 3)}
-                    points={points}
-                    check={checkPoint}
-                />
+                <Canvas radius={r} points={points} check={checkPoint} />
                 <form
                     onSubmit={handleSubmit}
                     style={{
@@ -236,6 +258,7 @@ const Page = () => {
                                         onClick={() =>
                                             handleDeletePoint(point, index)
                                         }
+                                        disabled={point.userId !== userId}
                                     >
                                         <DeleteOutline />
                                     </IconButton>
