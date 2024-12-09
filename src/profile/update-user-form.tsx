@@ -6,6 +6,7 @@ type UpdateUserFormProps = {
     email: string;
     setUsername: (username: string) => void;
     setEmail: (email: string) => void;
+    toast: (message: string) => void;
 };
 
 const UpdateUserForm = ({
@@ -13,6 +14,7 @@ const UpdateUserForm = ({
     email,
     setUsername,
     setEmail,
+    toast,
 }: UpdateUserFormProps) => {
     const [updateUser] = useUpdateUserInfoMutation();
 
@@ -23,7 +25,7 @@ const UpdateUserForm = ({
                 email,
             }).unwrap();
         } catch (error) {
-            console.error(error);
+            toast(error as string);
         }
     };
 

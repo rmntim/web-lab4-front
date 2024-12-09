@@ -2,7 +2,11 @@ import { Button, Grid2 as Grid, TextField } from "@mui/material";
 import { useState } from "react";
 import { useUpdatePasswordMutation } from "../store";
 
-const UpdatePasswordForm = () => {
+type UpdatePasswordFormProps = {
+    toast: (message: string) => void;
+};
+
+const UpdatePasswordForm = ({ toast }: UpdatePasswordFormProps) => {
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -11,7 +15,7 @@ const UpdatePasswordForm = () => {
 
     const handleUpdate = async () => {
         if (newPassword !== confirmPassword) {
-            alert("New password and confirmation do not match.");
+            toast("New password and confirmation do not match.");
             return;
         }
 
@@ -21,7 +25,7 @@ const UpdatePasswordForm = () => {
                 newPassword,
             }).unwrap();
         } catch (error) {
-            console.error(error);
+            toast(error as string);
         }
     };
 

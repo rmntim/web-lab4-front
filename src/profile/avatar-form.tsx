@@ -6,18 +6,19 @@ const MAX_FILE_SIZE = 2 << 20;
 
 type AvatarFormProps = {
     username: string;
+    toast: (message: string) => void;
 };
 
-const AvatarForm = ({ username }: AvatarFormProps) => {
+const AvatarForm = ({ username, toast }: AvatarFormProps) => {
     const [avatar, setAvatar] = useState("/placeholder-avatar.png");
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
     const handleUpdateAvatar = () => {
         if (avatarFile) {
-            alert("Avatar updated successfully!");
+            toast("Avatar updated successfully!");
             setAvatarFile(null);
         } else {
-            alert("No avatar selected.");
+            toast("No avatar selected.");
         }
     };
 
@@ -25,7 +26,7 @@ const AvatarForm = ({ username }: AvatarFormProps) => {
         const file = event.target.files?.[0];
         if (file) {
             if (file.size > MAX_FILE_SIZE) {
-                alert(
+                toast(
                     `File size exceeds ${MAX_FILE_SIZE >> 20} MiB. Please choose a smaller file.`
                 );
                 return;

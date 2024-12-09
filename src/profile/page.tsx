@@ -10,6 +10,8 @@ import {
     DialogContentText,
     DialogTitle,
     CircularProgress,
+    Alert,
+    Snackbar,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
@@ -56,6 +58,19 @@ const ProfilePage = () => {
         } catch (error) {
             console.error(error);
         }
+    };
+
+    const [toastOpen, setToastOpen] = useState(false);
+    const [toastMessage, setToastMessage] = useState("");
+
+    const handleToastClose = () => {
+        setToastOpen(false);
+        setToastMessage("");
+    };
+
+    const toast = (message: string) => {
+        setToastOpen(true);
+        setToastMessage(message);
     };
 
     if (error) {
@@ -109,7 +124,7 @@ const ProfilePage = () => {
             </Typography>
             <Grid container spacing={2} alignItems="center">
                 <Grid size={12} textAlign="center">
-                    <AvatarForm username={username} />
+                    <AvatarForm username={username} toast={toast} />
                 </Grid>
 
                 <Grid size={12}>
@@ -118,11 +133,12 @@ const ProfilePage = () => {
                         email={email}
                         setUsername={setUsername}
                         setEmail={setEmail}
+                        toast={toast}
                     />
                 </Grid>
 
                 <Grid size={12}>
-                    <UpdatePasswordForm />
+                    <UpdatePasswordForm toast={toast} />
                 </Grid>
             </Grid>
 
@@ -179,6 +195,13 @@ const ProfilePage = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+            <Snackbar
+                open={toastOpen}
+                autoHideDuration={6000}
+                onClose={handleToastClose}
+            >
+                <Alert severity="error">{toastMessage}</Alert>
+            </Snackbar>
         </Container>
     );
 };
