@@ -1,24 +1,24 @@
 import { PhotoCamera, Save as SaveIcon } from "@mui/icons-material";
 import { Avatar, IconButton } from "@mui/material";
+import { toast } from "mui-sonner";
 import { useState } from "react";
 
 const MAX_FILE_SIZE = 2 << 20;
 
 type AvatarFormProps = {
     username: string;
-    toast: (message: string) => void;
 };
 
-const AvatarForm = ({ username, toast }: AvatarFormProps) => {
+const AvatarForm = ({ username }: AvatarFormProps) => {
     const [avatar, setAvatar] = useState("/placeholder-avatar.png");
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
     const handleUpdateAvatar = () => {
         if (avatarFile) {
-            toast("Avatar updated successfully!");
+            toast.success("Avatar updated successfully!");
             setAvatarFile(null);
         } else {
-            toast("No avatar selected.");
+            toast.error("No avatar selected.");
         }
     };
 
@@ -26,7 +26,7 @@ const AvatarForm = ({ username, toast }: AvatarFormProps) => {
         const file = event.target.files?.[0];
         if (file) {
             if (file.size > MAX_FILE_SIZE) {
-                toast(
+                toast.error(
                     `File size exceeds ${MAX_FILE_SIZE >> 20} MiB. Please choose a smaller file.`
                 );
                 return;

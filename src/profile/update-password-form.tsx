@@ -1,13 +1,10 @@
-import { AlertColor, Button, Grid2 as Grid, TextField } from "@mui/material";
+import { Button, Grid2 as Grid, TextField } from "@mui/material";
 import { useState } from "react";
 import { useUpdatePasswordMutation } from "../store";
 import { isBackendError } from "../globals";
+import { toast } from "mui-sonner";
 
-type UpdatePasswordFormProps = {
-    toast: (message: string, severity?: AlertColor) => void;
-};
-
-const UpdatePasswordForm = ({ toast }: UpdatePasswordFormProps) => {
+const UpdatePasswordForm = () => {
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -16,7 +13,7 @@ const UpdatePasswordForm = ({ toast }: UpdatePasswordFormProps) => {
 
     const handleUpdate = async () => {
         if (newPassword !== confirmPassword) {
-            toast("New password and confirmation do not match.");
+            toast.error("New password and confirmation do not match.");
             return;
         }
 
@@ -25,11 +22,11 @@ const UpdatePasswordForm = ({ toast }: UpdatePasswordFormProps) => {
                 currentPassword,
                 newPassword,
             }).unwrap();
-            toast("Password updated successfully.", "success");
+            toast.success("Password updated successfully.");
         } catch (error) {
             console.error(error);
             if (isBackendError(error)) {
-                toast(error.data.message);
+                toast.error(error.data.message);
             }
         }
     };
