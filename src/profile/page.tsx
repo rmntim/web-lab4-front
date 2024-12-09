@@ -21,6 +21,7 @@ import {
     useDeleteUserMutation,
     useLazyGetUserInfoQuery,
     useLogoutUserMutation,
+    useUpdateUserInfoMutation,
 } from "../store";
 import { Navigate, useNavigate } from "react-router-dom";
 
@@ -34,6 +35,7 @@ const ProfilePage = () => {
     const [email, setEmail] = useState("john.doe@example.com");
 
     const [deleteUser] = useDeleteUserMutation();
+    const [updateUser] = useUpdateUserInfoMutation();
 
     useEffect(() => {
         trigger().then(({ data }) => {
@@ -44,9 +46,6 @@ const ProfilePage = () => {
         });
     }, [trigger]);
 
-    const [currentPassword, setCurrentPassword] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
     const [avatar, setAvatar] = useState("/placeholder-avatar.png");
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [openDialog, setOpenDialog] = useState(false);
@@ -61,13 +60,15 @@ const ProfilePage = () => {
         }
     };
 
-    const handleUpdatePassword = () => {
-        if (newPassword !== confirmPassword) {
-            alert("New password and confirmation do not match.");
-            return;
+    const handleUpdate = async () => {
+        try {
+            await updateUser({
+                username,
+                email,
+            }).unwrap();
+        } catch (error) {
+            console.error(error);
         }
-        // Implement logic to update password (API call)
-        alert("Password updated successfully!");
     };
 
     const handleLogout = () => {
@@ -207,71 +208,23 @@ const ProfilePage = () => {
                     />
                 </Grid>
 
-                {/* Password Section */}
-                <Grid size={12}>
-                    <TextField
-                        fullWidth
-                        label="Current Password"
-                        variant="outlined"
-                        type="password"
-                        value={currentPassword}
-                        onChange={(e) => setCurrentPassword(e.target.value)}
-                    />
-                </Grid>
-                <Grid size={12}>
-                    <TextField
-                        fullWidth
-                        label="New Password"
-                        variant="outlined"
-                        type="password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                    />
-                </Grid>
-                <Grid size={12}>
-                    <TextField
-                        fullWidth
-                        label="Confirm New Password"
-                        variant="outlined"
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                    />
-                </Grid>
                 <Grid size={12}>
                     <Container
                         sx={{
                             display: "flex",
                             justifyContent: "space-between",
                             alignItems: "center",
-                            flexDirection: "column",
+                            flexDirection: "row",
                             gap: "1rem",
                         }}
                     >
-                        <Container
-                            sx={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                                flexDirection: "row",
-                                gap: "1rem",
-                            }}
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleUpdate}
                         >
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={handleUpdatePassword}
-                            >
-                                Save
-                            </Button>
-                            <Button
-                                variant="outlined"
-                                color="error"
-                                onClick={handleLogout}
-                            >
-                                Log out
-                            </Button>
-                        </Container>
+                            Save
+                        </Button>
                         <Button
                             variant="outlined"
                             color="error"
@@ -279,6 +232,13 @@ const ProfilePage = () => {
                             onClick={() => setOpenDialog(true)}
                         >
                             Delete Account
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            color="error"
+                            onClick={handleLogout}
+                        >
+                            Log out
                         </Button>
                     </Container>
                 </Grid>

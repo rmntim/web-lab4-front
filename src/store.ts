@@ -26,6 +26,8 @@ const userSlice = createSlice({
     },
 });
 
+type UpdateUserInfo = Omit<UserInfo, "avatarUrl" | "id">;
+
 const apiSlice = createApi({
     reducerPath: "api",
     baseQuery: fetchBaseQuery({
@@ -72,6 +74,17 @@ const apiSlice = createApi({
                 url: `users`,
             }),
         }),
+        updateUserInfo: builder.mutation<UserInfo, UpdateUserInfo>({
+            query: (user) => ({
+                url: `users`,
+                method: "PATCH",
+                body: { ...user },
+            }),
+            onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+                const { data: result } = await queryFulfilled;
+                dispatch(userSlice.actions.updateUserInfo(result));
+            },
+        }),
         deleteUser: builder.mutation<void, void>({
             query: () => ({
                 url: `users`,
@@ -113,6 +126,7 @@ export const {
     useLogoutUserMutation,
 
     useLazyGetUserInfoQuery,
+    useUpdateUserInfoMutation,
     useDeleteUserMutation,
 
     useLazyGetUserPointsQuery,
