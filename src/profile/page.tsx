@@ -12,6 +12,7 @@ import {
     CircularProgress,
     Alert,
     Snackbar,
+    AlertColor,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
@@ -61,6 +62,7 @@ const ProfilePage = () => {
     };
 
     const [toastOpen, setToastOpen] = useState(false);
+    const [toastSeverity, setToastSeverity] = useState<AlertColor>("error");
     const [toastMessage, setToastMessage] = useState("");
 
     const handleToastClose = () => {
@@ -68,7 +70,8 @@ const ProfilePage = () => {
         setToastMessage("");
     };
 
-    const toast = (message: string) => {
+    const toast = (message: string, severity: AlertColor = "error") => {
+        setToastSeverity(severity);
         setToastOpen(true);
         setToastMessage(message);
     };
@@ -200,7 +203,7 @@ const ProfilePage = () => {
                 autoHideDuration={6000}
                 onClose={handleToastClose}
             >
-                <Alert severity="error">{toastMessage}</Alert>
+                <Alert severity={toastSeverity}>{toastMessage}</Alert>
             </Snackbar>
         </Container>
     );

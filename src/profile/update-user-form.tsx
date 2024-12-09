@@ -1,4 +1,4 @@
-import { Grid2 as Grid, TextField, Button } from "@mui/material";
+import { Grid2 as Grid, TextField, Button, AlertColor } from "@mui/material";
 import { useUpdateUserInfoMutation } from "../store";
 import { isBackendError } from "../globals";
 
@@ -7,7 +7,7 @@ type UpdateUserFormProps = {
     email: string;
     setUsername: (username: string) => void;
     setEmail: (email: string) => void;
-    toast: (message: string) => void;
+    toast: (message: string, severity?: AlertColor) => void;
 };
 
 const UpdateUserForm = ({
@@ -25,6 +25,7 @@ const UpdateUserForm = ({
                 username,
                 email,
             }).unwrap();
+            toast("Profile updated successfully.", "success");
         } catch (error) {
             console.error(error);
             if (isBackendError(error)) {

@@ -1,10 +1,10 @@
-import { Button, Grid2 as Grid, TextField } from "@mui/material";
+import { AlertColor, Button, Grid2 as Grid, TextField } from "@mui/material";
 import { useState } from "react";
 import { useUpdatePasswordMutation } from "../store";
 import { isBackendError } from "../globals";
 
 type UpdatePasswordFormProps = {
-    toast: (message: string) => void;
+    toast: (message: string, severity?: AlertColor) => void;
 };
 
 const UpdatePasswordForm = ({ toast }: UpdatePasswordFormProps) => {
@@ -25,6 +25,7 @@ const UpdatePasswordForm = ({ toast }: UpdatePasswordFormProps) => {
                 currentPassword,
                 newPassword,
             }).unwrap();
+            toast("Password updated successfully.", "success");
         } catch (error) {
             console.error(error);
             if (isBackendError(error)) {
