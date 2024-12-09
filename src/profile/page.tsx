@@ -17,7 +17,11 @@ import {
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import SaveIcon from "@mui/icons-material/Save";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useLazyGetUserInfoQuery, useLogoutUserMutation } from "../store";
+import {
+    useDeleteUserMutation,
+    useLazyGetUserInfoQuery,
+    useLogoutUserMutation,
+} from "../store";
 import { Navigate, useNavigate } from "react-router-dom";
 
 const MAX_FILE_SIZE = 2 << 20;
@@ -28,6 +32,8 @@ const ProfilePage = () => {
     const navigate = useNavigate();
     const [username, setUsername] = useState("John Doe");
     const [email, setEmail] = useState("john.doe@example.com");
+
+    const [deleteUser] = useDeleteUserMutation();
 
     useEffect(() => {
         trigger().then(({ data }) => {
@@ -90,9 +96,14 @@ const ProfilePage = () => {
         }
     };
 
-    const handleDeleteAccount = () => {
+    const handleDeleteAccount = async () => {
         setOpenDialog(false);
-        alert("Account deleted!");
+        try {
+            await deleteUser().unwrap();
+            navigate("/");
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     if (error) {

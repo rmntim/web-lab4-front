@@ -66,9 +66,16 @@ const apiSlice = createApi({
                 );
             },
         }),
+
         getUserInfo: builder.query<UserInfo, void>({
             query: () => ({
                 url: `users`,
+            }),
+        }),
+        deleteUser: builder.mutation<void, void>({
+            query: () => ({
+                url: `users`,
+                method: "DELETE",
             }),
         }),
 
@@ -104,7 +111,9 @@ export const {
     useLoginUserMutation,
     useSignupUserMutation,
     useLogoutUserMutation,
+
     useLazyGetUserInfoQuery,
+    useDeleteUserMutation,
 
     useLazyGetUserPointsQuery,
     useAddUserPointMutation,
