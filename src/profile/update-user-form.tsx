@@ -1,5 +1,6 @@
 import { Grid2 as Grid, TextField, Button } from "@mui/material";
 import { useUpdateUserInfoMutation } from "../store";
+import { isBackendError } from "../globals";
 
 type UpdateUserFormProps = {
     username: string;
@@ -25,7 +26,10 @@ const UpdateUserForm = ({
                 email,
             }).unwrap();
         } catch (error) {
-            toast(error as string);
+            console.error(error);
+            if (isBackendError(error)) {
+                toast(error.data.message);
+            }
         }
     };
 
