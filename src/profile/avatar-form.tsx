@@ -2,23 +2,43 @@ import { PhotoCamera, Save as SaveIcon } from "@mui/icons-material";
 import { Avatar, IconButton } from "@mui/material";
 import { toast } from "mui-sonner";
 import { useState } from "react";
+import { useUpdateAvatarMutation } from "../store";
+import { isBackendError } from "../globals";
 
 const MAX_FILE_SIZE = 2 << 20;
 
 type AvatarFormProps = {
     username: string;
+    avatar: string;
+    setAvatar: (avatar: string) => void;
 };
 
-const AvatarForm = ({ username }: AvatarFormProps) => {
-    const [avatar, setAvatar] = useState("/placeholder-avatar.png");
+const AvatarForm = ({ username, avatar, setAvatar }: AvatarFormProps) => {
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
+    const [updateAvatar] = useUpdateAvatarMutation();
 
-    const handleUpdateAvatar = () => {
-        if (avatarFile) {
-            toast.success("Avatar updated successfully!");
-            setAvatarFile(null);
-        } else {
+    const handleUpdateAvatar = async () => {
+        if (!avatarFile) {
             toast.error("No avatar selected.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", avatarFile);
+
+        try {
+            const userInfo = await updateAvatar(formData).unwrap();
+            setAvatar(userInfo.avatarUrl);
+            toast.success("Avatar updated successfully!");
+        } catch (err) {
+            console.error(err);
+            if (isBackendError(err)) {
+                toast.error(
+                    "An error occurred while uploading." + err.data.message
+                );
+            }
+        } finally {
+            setAvatarFile(null);
         }
     };
 
@@ -58,7 +78,7 @@ const AvatarForm = ({ username }: AvatarFormProps) => {
                 <PhotoCamera />
                 <input
                     type="file"
-                    accept="image/*"
+                    accept="image/png"
                     hidden
                     onChange={handleAvatarChange}
                 />

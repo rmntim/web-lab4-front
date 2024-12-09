@@ -29,6 +29,7 @@ const ProfilePage = () => {
 
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
+    const [avatar, setAvatar] = useState("/placeholder-avatar.png");
 
     const [deleteUser] = useDeleteUserMutation();
 
@@ -37,6 +38,7 @@ const ProfilePage = () => {
             if (data) {
                 setUsername(data.username);
                 setEmail(data.email);
+                setAvatar(data.avatarUrl);
             }
         });
     }, [trigger]);
@@ -109,7 +111,11 @@ const ProfilePage = () => {
             </Typography>
             <Grid container spacing={2} alignItems="center">
                 <Grid size={12} textAlign="center">
-                    <AvatarForm username={username} />
+                    <AvatarForm
+                        username={username}
+                        avatar={avatar}
+                        setAvatar={setAvatar}
+                    />
                 </Grid>
 
                 <Grid size={12}>

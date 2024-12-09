@@ -97,6 +97,17 @@ const apiSlice = createApi({
                 body: { ...user },
             }),
         }),
+        updateAvatar: builder.mutation<UserInfo, FormData>({
+            query: (data) => ({
+                url: `users/avatar`,
+                method: "POST",
+                body: data,
+            }),
+            onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+                const { data: result } = await queryFulfilled;
+                dispatch(userSlice.actions.updateUserInfo(result));
+            },
+        }),
         deleteUser: builder.mutation<void, void>({
             query: () => ({
                 url: `users`,
@@ -140,6 +151,7 @@ export const {
     useLazyGetUserInfoQuery,
     useUpdateUserInfoMutation,
     useUpdatePasswordMutation,
+    useUpdateAvatarMutation,
     useDeleteUserMutation,
 
     useLazyGetUserPointsQuery,
