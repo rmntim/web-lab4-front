@@ -78,7 +78,7 @@ const AvatarForm = ({ username, avatar, setAvatar }: AvatarFormProps) => {
                 <PhotoCamera />
                 <input
                     type="file"
-                    accept="image/png"
+                    accept="image/*"
                     hidden
                     onChange={handleAvatarChange}
                 />
