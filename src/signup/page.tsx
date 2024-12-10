@@ -45,6 +45,10 @@ const Signup = () => {
         await handleSignup(email, username, password);
     };
 
+    const goToLogin = () => {
+        navigate("/login", { replace: true });
+    };
+
     return (
         <Container maxWidth="sm" sx={{ mt: 8 }}>
             <Paper elevation={3} sx={{ p: 4 }}>
@@ -112,6 +116,16 @@ const Signup = () => {
                                 type="submit"
                             >
                                 Signup
+                            </Button>
+                        </Grid>
+                        <Grid size={12}>
+                            <Button
+                                fullWidth
+                                variant="text"
+                                onClick={goToLogin}
+                                sx={{ color: "text.primary" }}
+                            >
+                                Login
                             </Button>
                         </Grid>
                     </Grid>

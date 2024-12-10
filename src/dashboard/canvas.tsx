@@ -1,6 +1,6 @@
 import { MouseEvent, useCallback, useEffect, useRef } from "react";
 import { useTheme } from "@mui/material";
-import { hashUserIdForColor, PointResult } from "../globals";
+import { colorFromUserId, PointResult } from "../globals";
 
 type CanvasProps = {
     radius: number;
@@ -23,16 +23,6 @@ const Canvas = ({
     const sign = r >= 0 ? 1 : -1;
     const radius = Math.abs(r);
 
-    const colorFromUserId = (result: boolean, userId: number) => {
-        const colorCode = hashUserIdForColor(userId);
-
-        const red = Math.floor(Math.floor(colorCode / 256) / 256) % 256;
-        const green = Math.floor(Math.floor(colorCode / 256) % 256);
-        const blue = Math.floor(colorCode % 256);
-
-        return `rgba(${red}, ${green}, ${blue}, ${result ? 1 : 0.33})`;
-    };
-
     const addPoint = useCallback(
         (
             canvas: HTMLCanvasElement,
@@ -50,7 +40,7 @@ const Canvas = ({
             ctx.beginPath();
             ctx.arc(actualX, actualY, 3, 0, 2 * Math.PI, true);
             ctx.closePath();
-            ctx.fillStyle = colorFromUserId(result, userId);
+            ctx.fillStyle = colorFromUserId(userId, result);
             ctx.fill();
         },
         [MULTIPLIER]

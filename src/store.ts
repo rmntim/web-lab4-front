@@ -26,6 +26,13 @@ const userSlice = createSlice({
     },
 });
 
+type UpdateUserInfo = Omit<UserInfo, "avatarUrl" | "id">;
+
+type UpdatePassword = {
+    currentPassword: string;
+    newPassword: string;
+};
+
 const apiSlice = createApi({
     reducerPath: "api",
     baseQuery: fetchBaseQuery({
@@ -66,9 +73,50 @@ const apiSlice = createApi({
                 );
             },
         }),
+
         getUserInfo: builder.query<UserInfo, void>({
             query: () => ({
                 url: `users`,
+            }),
+        }),
+        getUserInfoById: builder.query<UserInfo, UserInfo["id"]>({
+            query: (id) => ({
+                url: `users/${id}`,
+            }),
+        }),
+        updateUserInfo: builder.mutation<UserInfo, UpdateUserInfo>({
+            query: (user) => ({
+                url: `users`,
+                method: "PATCH",
+                body: { ...user },
+            }),
+            onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+                const { data: result } = await queryFulfilled;
+                dispatch(userSlice.actions.updateUserInfo(result));
+            },
+        }),
+        updatePassword: builder.mutation<void, UpdatePassword>({
+            query: (user) => ({
+                url: `users/password`,
+                method: "PATCH",
+                body: { ...user },
+            }),
+        }),
+        updateAvatar: builder.mutation<UserInfo, FormData>({
+            query: (data) => ({
+                url: `users/avatar`,
+                method: "POST",
+                body: data,
+            }),
+            onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+                const { data: result } = await queryFulfilled;
+                dispatch(userSlice.actions.updateUserInfo(result));
+            },
+        }),
+        deleteUser: builder.mutation<void, void>({
+            query: () => ({
+                url: `users`,
+                method: "DELETE",
             }),
         }),
 
@@ -104,7 +152,13 @@ export const {
     useLoginUserMutation,
     useSignupUserMutation,
     useLogoutUserMutation,
+
     useLazyGetUserInfoQuery,
+    useLazyGetUserInfoByIdQuery,
+    useUpdateUserInfoMutation,
+    useUpdatePasswordMutation,
+    useUpdateAvatarMutation,
+    useDeleteUserMutation,
 
     useLazyGetUserPointsQuery,
     useAddUserPointMutation,

@@ -11,6 +11,7 @@ import {
 import { AccountCircle, Brightness4, Brightness7 } from "@mui/icons-material";
 import { Outlet, useNavigate } from "react-router-dom";
 import Clock from "./clock";
+import { Toaster } from "mui-sonner";
 
 const Layout = () => {
     const navigate = useNavigate();
@@ -61,6 +62,7 @@ const Layout = () => {
                 </Toolbar>
             </AppBar>
             <Outlet />
+            <Toaster />
         </ThemeProvider>
     );
 };

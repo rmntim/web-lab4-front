@@ -16,9 +16,8 @@ import {
     DialogActions,
     DialogContentText,
     IconButton,
-    Snackbar,
-    Alert,
     Typography,
+    Tooltip,
 } from "@mui/material";
 import {
     RootState,
@@ -30,8 +29,10 @@ import {
 import { Navigate } from "react-router-dom";
 import { PointResult } from "../globals";
 import Canvas from "./canvas";
-import { DeleteOutline } from "@mui/icons-material";
+import { DeleteOutline, Info } from "@mui/icons-material";
 import { useSelector } from "react-redux";
+import { toast } from "mui-sonner";
+import UserTooltip from "./user-tooltip";
 
 const Page = () => {
     const [trigger, { error }] = useLazyGetUserPointsQuery();
@@ -55,19 +56,6 @@ const Page = () => {
 
     const [deleteAllOpen, setDeleteAllOpen] = useState(false);
 
-    const [toastOpen, setToastOpen] = useState(false);
-    const [toastMessage, setToastMessage] = useState("");
-
-    const handleToastClose = () => {
-        setToastOpen(false);
-        setToastMessage("");
-    };
-
-    const toast = (message: string) => {
-        setToastOpen(true);
-        setToastMessage(message);
-    };
-
     const handleDeleteAllClose = () => {
         setDeleteAllOpen(false);
     };
@@ -82,7 +70,7 @@ const Page = () => {
             console.log(point);
             setPoints((prev) => [...prev, point]);
         } catch (err) {
-            toast("Failed to add point");
+            toast.error("Failed to add point");
             console.error("Failed to add point", err);
         }
     };
@@ -100,7 +88,7 @@ const Page = () => {
             );
             setDeleteAllOpen(false);
         } catch (err) {
-            toast("Failed to delete all points");
+            toast.error("Failed to delete all points");
             console.error("Failed to delete all points", err);
         }
     };
@@ -110,7 +98,7 @@ const Page = () => {
             await deleteUserPoint(point).unwrap();
             setPoints((prev) => prev.filter((_, i) => i !== index));
         } catch (err) {
-            toast("Failed to delete point");
+            toast.error("Failed to delete point");
             console.error("Failed to delete point", err);
         }
     };
@@ -240,6 +228,7 @@ const Page = () => {
                             <TableCell>R</TableCell>
                             <TableCell>Result</TableCell>
                             <TableCell>Delete</TableCell>
+                            <TableCell>User</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -263,18 +252,24 @@ const Page = () => {
                                         <DeleteOutline />
                                     </IconButton>
                                 </TableCell>
+                                <TableCell>
+                                    <Tooltip
+                                        title={
+                                            <UserTooltip
+                                                userId={point.userId}
+                                            />
+                                        }
+                                    >
+                                        <IconButton>
+                                            <Info />
+                                        </IconButton>
+                                    </Tooltip>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </TableContainer>
-            <Snackbar
-                open={toastOpen}
-                autoHideDuration={6000}
-                onClose={handleToastClose}
-            >
-                <Alert severity="error">{toastMessage}</Alert>
-            </Snackbar>
         </Container>
     );
 };
